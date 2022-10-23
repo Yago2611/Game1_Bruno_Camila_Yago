@@ -54,6 +54,12 @@ def main():
       P2_VY = -VELOCIDADE
     else:
       P2_VY = 0 
+    if (P1_VX!=0) and (P1_VY!=0):
+      P1_VY *= (2**0.5)/2
+      P1_VX *= (2**0.5)/2
+    if (P2_VX!=0) and (P2_VY!=0):
+      P2_VY *= (2**0.5)/2
+      P2_VX *= (2**0.5)/2
    
     #Mudar a posicao dos jogadores
     Novo_P1_X = P1_X + P1_VX
