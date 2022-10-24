@@ -1,12 +1,5 @@
-import pygame as pg
+import pygame as pg 
 import sys 
-
-#Definindo as Configuracoes do jogo
-LARGURA_TELA = 1200 
-ALTURA_TELA = 600
-ALTURA_JOGADOR = 50
-LARGURA_JOGADOR = 10
-VELOCIDADE = 1 
 
 #Pegar uma imagem
 def load_image(name, colorkey=None, scale=1.0):
@@ -19,22 +12,23 @@ def load_image(name, colorkey=None, scale=1.0):
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pg.RLEACCEL)
-    """imagem = load_image('onu.png', scale=0.35)
-    rect = imagem.get_rect()
-    largura = rect.width
-    altura = rect.height
-    tela.blit(imagem, (-100,-100))"""
     return image
 
+#Definindo as Configuracoes do jogo
+LARGURA_TELA = 1200 
+ALTURA_TELA = 600
+VELOCIDADE = 1
+
 def main():
-   #Dados dos jogadores
-   P1_X = 0.1*LARGURA_TELA
-   P1_Y = ALTURA_TELA//2 - ALTURA_JOGADOR//2
-   P2_X = 0.9*LARGURA_TELA-LARGURA_JOGADOR
-   P2_Y = ALTURA_TELA//2 - ALTURA_JOGADOR//2
 
    #Inicializando o pygame
    pg.init()
+
+   #Dados dos jogadores
+   P1_X = 0.1*LARGURA_TELA
+   P1_Y = ALTURA_TELA//2 
+   P2_X = 0.9*LARGURA_TELA
+   P2_Y = ALTURA_TELA//2 
    
    #Criando a tela 
    tela = pg.display.set_mode((LARGURA_TELA, ALTURA_TELA))
@@ -42,10 +36,16 @@ def main():
    #Análise de eventos
    while True:
     for event in pg.event.get():
-        #Se a janela for fechada
+        #Evento de fechar a janela
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
+
+    imagem = load_image('nikola1.png', scale=1)
+    imagem2 = load_image('marie1.png', scale=1)
+    rect = imagem.get_rect()
+    LARGURA_JOGADOR = rect.width
+    ALTURA_JOGADOR = rect.height
             
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
@@ -94,11 +94,14 @@ def main():
       P2_Y = Novo_P2_Y
     
     #Desenhar a tela
+    """tela.fill((255, 255, 255))
+    pg.draw.rect(tela,(0, 0, 255),(0.025*LARGURA_TELA, 0.05*ALTURA_TELA, 0.95*LARGURA_TELA, 0.9*ALTURA_TELA),0)"""
     tela.fill((0, 0, 255))
     pg.draw.rect(tela,(0, 255, 0),(0.05*LARGURA_TELA, 0.1*ALTURA_TELA, 0.9*LARGURA_TELA, 0.8*ALTURA_TELA),0)
+    #Pegar uma imagem
+    tela.blit(imagem, (P1_X,P1_Y))
+    tela.blit(imagem2, (P2_X,P2_Y))
     #Desenha os jogadores
-    pg.draw.rect(tela,(0, 0, 0),(P1_X, P1_Y, 10, 50),0)
-    pg.draw.rect(tela,(0, 0, 0),(P2_X,P2_Y, 10, 50),0)
     #Atualizar a tela
     pg.display.flip()
 
