@@ -1,0 +1,2 @@
+class Minions:
+  pass
