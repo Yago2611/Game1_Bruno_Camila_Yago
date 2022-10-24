@@ -1,0 +1,6 @@
+Class Configuracoes:
+  LARGURA_TELA = 1200 
+   ALTURA_TELA = 600
+   ALTURA_JOGADOR = 50
+   LARGURA_JOGADOR = 10
+   VELOCIDADE = 1
