@@ -8,6 +8,24 @@ ALTURA_JOGADOR = 50
 LARGURA_JOGADOR = 10
 VELOCIDADE = 1 
 
+#Pegar uma imagem
+def load_image(name, colorkey=None, scale=1.0):
+    image = pg.image.load(name)
+    size = image.get_size()
+    size = (int(size[0] * scale), int(size[1] * scale))
+    image = pg.transform.scale(image, size)
+    image = image.convert_alpha()
+    if colorkey is not None:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey, pg.RLEACCEL)
+    """imagem = load_image('onu.png', scale=0.35)
+    rect = imagem.get_rect()
+    largura = rect.width
+    altura = rect.height
+    tela.blit(imagem, (-100,-100))"""
+    return image
+
 def main():
    #Dados dos jogadores
    P1_X = 0.1*LARGURA_TELA
