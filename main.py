@@ -81,16 +81,16 @@ def main():
    
     #Mudar a posicao dos jogadores
     Novo_P1_X = P1_X + P1_VX
-    if (Novo_P1_X<=(LARGURA_TELA-LARGURA_JOGADOR)) and (Novo_P1_X>=0):
+    if (Novo_P1_X<=(0.95*(LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P1_X>=0.05*LARGURA_TELA):
       P1_X = Novo_P1_X
     Novo_P2_X = P2_X + P2_VX
-    if (Novo_P2_X<=(LARGURA_TELA-LARGURA_JOGADOR)) and (Novo_P2_X>=0):
+    if (Novo_P2_X<=(0.95*(LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P2_X>=0.05*LARGURA_TELA):
       P2_X = Novo_P2_X
     Novo_P1_Y = P1_Y + P1_VY
-    if (Novo_P1_Y<=(ALTURA_TELA-ALTURA_JOGADOR)) and (Novo_P1_Y>=0):
+    if (Novo_P1_Y<=(0.9*(ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P1_Y>=0.1*ALTURA_TELA):
       P1_Y = Novo_P1_Y
     Novo_P2_Y = P2_Y + P2_VY
-    if (Novo_P2_Y<=(ALTURA_TELA-ALTURA_JOGADOR)) and (Novo_P2_Y>=0):
+    if (Novo_P2_Y<=(0.9*(ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P2_Y>=0.1*ALTURA_TELA):
       P2_Y = Novo_P2_Y
     
     #Desenhar a tela
