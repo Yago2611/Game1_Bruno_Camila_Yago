@@ -94,7 +94,8 @@ def main():
       P2_Y = Novo_P2_Y
     
     #Desenhar a tela
-    tela.fill((0, 122, 0))
+    tela.fill((0, 0, 255))
+    pg.draw.rect(tela,(0, 255, 0),(0.05*LARGURA_TELA, 0.1*ALTURA_TELA, 0.9*LARGURA_TELA, 0.8*ALTURA_TELA),0)
     #Desenha os jogadores
     pg.draw.rect(tela,(0, 0, 0),(P1_X, P1_Y, 10, 50),0)
     pg.draw.rect(tela,(0, 0, 0),(P2_X,P2_Y, 10, 50),0)
