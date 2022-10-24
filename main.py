@@ -24,7 +24,7 @@ def main():
    #Análise de eventos
    while True:
     for event in pg.event.get():
-        #Evento de fechar a janela
+        #Se a janela for fechada
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
