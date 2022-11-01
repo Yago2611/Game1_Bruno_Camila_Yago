@@ -5,6 +5,3 @@ class Personagens():
   self.nome = nome
   self.poderes = poderes
   self.imagem = imagem
-  
-  def desenha(self, tela):
-     pass
