@@ -1,5 +1,7 @@
 import pygame as pg
 import sys 
+import jogador 
+
 
 class Cena_Inicial:
   def __init__(self,tela):
