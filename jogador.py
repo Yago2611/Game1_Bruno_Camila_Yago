@@ -16,5 +16,8 @@ class Jogador:
     self.vy = -Configuracoes.VELOCIDADE
   def mover_direita(self):
     self.vy = Configuracoes.VELOCIDADE
-  def posicao_na_tela(self, posicao):
+  def posicao_na_tela(self):
         self.posicao = (vx, vy)
+  def desenha(self, tela):
+        pygame.draw.circle(tela, (255,255,255),
+          self.posicao, 2)
