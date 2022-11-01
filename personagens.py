@@ -7,5 +7,4 @@ class Personagens():
   self.imagem = imagem
   
   def desenha(self, tela):
-    pass
-  
+     pass
