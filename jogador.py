@@ -14,3 +14,5 @@ class Jogador:
     self.vy = -Configuracoes.VELOCIDADE
   def mover_direita(self):
     self.vy = Configuracoes.VELOCIDADE
+  def posicao_na_tela(self, posicao):
+        self.posicao = (vx, vy)
