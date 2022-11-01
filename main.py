@@ -128,8 +128,8 @@ def main():
             print("Encerrando o programa.")
             sys.exit()
 
-    imagem = load_image('nikola1.png', scale=1)
-    imagem2 = load_image('marie1.png', scale=1)
+    imagem = load_image('nikola.png', scale=1)
+    imagem2 = load_image('marie.png', scale=1)
     imagem_raio = load_image('raio.png',scale=0.1)
     rect = imagem.get_rect()
     LARGURA_JOGADOR = rect.width
