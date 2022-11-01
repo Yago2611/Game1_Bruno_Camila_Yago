@@ -1,4 +1,6 @@
 import PERSONAGENS
 
 class Cena_Principal:
-  pass
+  def __init__(self, tela):
+    self.tela = tela
+    pass
