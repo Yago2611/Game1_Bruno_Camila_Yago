@@ -2,3 +2,5 @@ Class Configuracoes:
   LARGURA_TELA = 1200 
   ALTURA_TELA = 600
   VELOCIDADE = 1
+  FONTE_MAIOR = 48
+  FONTE_MENOR = 12
