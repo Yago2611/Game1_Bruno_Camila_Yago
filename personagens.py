@@ -16,5 +16,3 @@ class Personagens():
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
-  
- p1 = Personagens(nikola_tesla, raios, imagem)
