@@ -5,3 +5,15 @@ class Personagens():
   self.nome = nome
   self.poderes = poderes
   self.imagem = imagem
+  def load_image(name, colorkey=None, scale=1.0):
+    image = pg.image.load(name)
+    size = image.get_size()
+    size = (int(size[0] * scale), int(size[1] * scale))
+    image = pg.transform.scale(image, size)
+    image = image.convert_alpha()
+    if colorkey is not None:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey, pg.RLEACCEL)
+    return image
+
