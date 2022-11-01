@@ -1,12 +1,12 @@
 import PODERES
 
 class Personagens():
-  def__init__(self, nome, poderes, imagem)
-  self.nome = nome
+  def__init__(self, nikola_tesla, poderes, imagem)
+  self.nikola_tesla = nikola_tesla
   self.poderes = poderes
   self.imagem = imagem
-  def load_image(name, colorkey=None, scale=1.0):
-    image = pg.image.load(name)
+  def load_image(nikola_tesla, colorkey=None, scale=1.0):
+    image = pg.image.load(nikola_tesla)
     size = image.get_size()
     size = (int(size[0] * scale), int(size[1] * scale))
     image = pg.transform.scale(image, size)
