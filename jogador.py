@@ -1,4 +1,6 @@
 import pygame as pg
+import PERSONAGENS
+
 
 class Jogador:
   def __init__ (self,posicao,personagem):
