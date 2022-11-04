@@ -12,16 +12,15 @@ class Cena_Inicial:
     self.escolha_jog2 = False         
     #Criando os personagens
     self.personagem_1 = Personagem("Nikola Tesla",Raio,"Nikola.png",Configuracoes.VIDA)
-    self.personagem_2 = Personagem("Marie Curie",)
-    font_titulo = pg.font.SysFont(None, 12)
-    self.titulo = font_titulo.render(f'Escolha um personagem', True, (0,0,0))
-    titulo = pg.font.SysFont(None,FONTE_TITULO)
-    escolha = pg.font.SysFont(None, FONTE_MAIOR)
-    personagens = pg.font.SysFont(None, FONTE_MENOR)
-    Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
-    Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
-    Personagem1 = personagens.render(f'1) Nikola Tesla', True, (0,0,0))
-    Personagem2 = personagens.render(f'2) Marie Curie', True, (0,0,0))
+    self.personagem_2 = Personagem("Marie Curie",Veneno,"Marie.png",Configuracoes.VIDA)
+    #Criando os textos
+    fonte_titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
+    fonte_subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MAIOR)
+    fonte_nomes = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
+    self.titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
+    self.escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
+    self.personagem1 = personagens.render(f'1) {self.personagem_1.nome}', True, (0,0,0))
+    self.personagem2 = personagens.render(f'2) {self.personagem_2.nome}', True, (0,0,0))
     tela.fill((255, 255, 255))
     PX = LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
     PY = 0.01 * ALTURA_TELA
