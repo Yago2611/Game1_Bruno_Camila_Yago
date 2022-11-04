@@ -1,3 +1,6 @@
+from configuracoes import configuracoes
+from jogador import jogador
+
 class Jogo:
   def __init__(self):
         pg.init()
