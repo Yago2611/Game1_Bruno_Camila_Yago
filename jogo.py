@@ -1,5 +1,6 @@
-from configuracoes import configuracoes
-from jogador import jogador
+from cena_principal import Cena_principal
+from configuracoes import Configuracoes
+from jogador import Jogador
 
 class Jogo:
   def __init__(self):
