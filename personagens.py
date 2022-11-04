@@ -1,10 +1,13 @@
 import PODERES
 
 class Personagens():
-  def__init__(self, nome, poderes, imagem)
+  def__init__(self, nome, poderes, imagem, vida)
   self.nome = nikola_tesla
   self.poderes = poderes
   self.imagem = imagem
+  self.vida = vida 
+  
+  #Importando a imagem de um personagem para o programa
   def load_image(nome, colorkey=None, scale=1.0):
     image = pg.image.load(nome)
     size = image.get_size()
