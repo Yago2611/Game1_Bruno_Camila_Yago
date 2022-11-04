@@ -16,12 +16,12 @@ def load_image(name, colorkey=None, scale=1.0):
     return image
 
 #Definindo as Configuracoes do jogo
-LARGURA_TELA = 1200 
-ALTURA_TELA = 600
+LARGURA_TELA = 1600 
+ALTURA_TELA = 800
 FONTE_TITULO = 96
 FONTE_MAIOR = 48
 FONTE_MENOR = 48
-VELOCIDADE = 3
+VELOCIDADE = 5
 
 def main():
 
@@ -29,16 +29,20 @@ def main():
    pg.init()
     
    cena_inicial = True
-   cena_principal = False 
+   cena_principal = False
+   cena_final = False
 
    #Dados dos jogadores
    P1_X = 0.1*LARGURA_TELA
    P1_Y = ALTURA_TELA//2 
    P2_X = 0.9*LARGURA_TELA
    P2_Y = ALTURA_TELA//2 
-   px_bloco = LARGURA_TELA
-   py_bloco = ALTURA_TELA
-   v_bloco = 0 
+   px_raio = LARGURA_TELA
+   py_raio = ALTURA_TELA
+   v_raio = 0 
+   px_nuvem = LARGURA_TELA
+   py_nuvem = ALTURA_TELA
+   v_nuvem = 0 
     
    #Dados dos minions
    px_minion = LARGURA_TELA//2
@@ -121,17 +125,20 @@ def main():
    
    #Cena Principal
    #Análise de eventos
+   tempo = [0,30]
+   comeco = time.time()
    while cena_principal:
     for event in pg.event.get():
         #Evento de fechar a janela
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
-
-    imagem = load_image('nikola.png', scale=1)
+    imagem1 = load_image('nikola.png', scale=1)
     imagem2 = load_image('marie.png', scale=1)
+    imagem_minion = load_image('minion.png', scale=1)
     imagem_raio = load_image('raio.png',scale=0.1)
-    rect = imagem.get_rect()
+    imagem_nuvem = load_image('nuvem.png',scale=0.1)
+    rect = imagem1.get_rect()
     LARGURA_JOGADOR = rect.width
     ALTURA_JOGADOR = rect.height
             
@@ -166,7 +173,6 @@ def main():
     if (P2_VX!=0) and (P2_VY!=0):
       P2_VY *= (2**0.5)/2
       P2_VX *= (2**0.5)/2
-   
     #Mudar a posicao dos jogadores
     Novo_P1_X = P1_X + P1_VX
     if (Novo_P1_X<=(0.95*(LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P1_X>=0.05*LARGURA_TELA):
@@ -182,23 +188,21 @@ def main():
       P2_Y = Novo_P2_Y
     
     #Desenhar a tela
-    """tela.fill((255, 255, 255))
-    pg.draw.rect(tela,(0, 0, 255),(0.025*LARGURA_TELA, 0.05*ALTURA_TELA, 0.95*LARGURA_TELA, 0.9*ALTURA_TELA),0)"""
     tela.fill((0, 0, 255))
     pg.draw.rect(tela,(0, 255, 0),(0.05*LARGURA_TELA, 0.1*ALTURA_TELA, 0.9*LARGURA_TELA, 0.8*ALTURA_TELA),0)
     #Pegar uma imagem
-    tela.blit(imagem, (P1_X,P1_Y))
+    tela.blit(imagem1, (P1_X,P1_Y))
     tela.blit(imagem2, (P2_X,P2_Y))
     #Desenha os jogadores
     
     #Minions
     if minion:
-        tela.blit(imagem, (px_minion,py_minion))
+        tela.blit(imagem_minion, (px_minion,py_minion))
     
     #Velocidade
     vx_minion = P1_X - px_minion
     vy_minion = P1_Y - py_minion 
-    velocidade_minion = ((vx_minion**2 + vy_minion**2)**0.5)*4
+    velocidade_minion = ((vx_minion**2 + vy_minion**2)**0.5)/2
     if (velocidade_minion!=0):
         vx_minion/=velocidade_minion
         vy_minion/=velocidade_minion
@@ -208,35 +212,91 @@ def main():
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      px_bloco = P1_X
-      py_bloco = P1_Y
-      v_bloco = 1
+      px_raio = P1_X
+      py_raio = P1_Y
+      v_raio = VELOCIDADE
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
-      px_bloco = P1_X
-      py_bloco = P1_Y
-      v_bloco = -1
+      px_raio = P1_X
+      py_raio = P1_Y
+      v_raio = -VELOCIDADE
 
-    tela.blit(imagem_raio, (px_bloco,py_bloco))
-    px_bloco += v_bloco
-    px_bloco += v_bloco
+    if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
+      px_nuvem = P2_X
+      py_nuvem = P2_Y
+      v_nuvem = VELOCIDADE
+    if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
+      px_nuvem = P2_X
+      py_nuvem = P2_Y
+      v_nuvem = -VELOCIDADE
+
+    tela.blit(imagem_raio, (px_raio,py_raio))
+    px_raio += v_raio
+    px_raio += v_raio
 
     tamanho = imagem_raio.get_rect()
-    largura_bloco = tamanho.width
-    altura_bloco = tamanho.height
+    largura_raio = tamanho.width
+    altura_raio = tamanho.height
 
-    if (px_bloco+altura_bloco>=px_minion and px_bloco<=px_minion+largura_minion) and (py_bloco+largura_bloco>=py_minion and py_bloco<=py_minion+altura_minion):
+    tela.blit(imagem_nuvem, (px_nuvem,py_nuvem))
+    px_nuvem += v_nuvem
+    px_nuvem += v_nuvem
+
+    tamanho2 = imagem_nuvem.get_rect()
+    largura_nuvem = tamanho2.width
+    altura_nuvem = tamanho2.height
+
+    if (px_raio+altura_raio>=px_minion and px_raio<=px_minion+largura_minion) and (py_raio+largura_raio>=py_minion and py_raio<=py_minion+altura_minion):
         minion = False
-        tempo_referencia = time.localtime()[5]
+        tempo_referencia = time.time()
+    
+    if (px_nuvem+altura_nuvem>=px_minion and px_nuvem<=px_minion+largura_minion) and (py_nuvem+largura_nuvem>=py_minion and py_nuvem<=py_minion+altura_minion):
+        minion = False
+        tempo_referencia = time.time()
 
-    tempo_atual = time.localtime()[5]
+    tempo_atual = time.time()
+    agora = time.time()
     if tempo_referencia>0:
         tempo_passado = tempo_atual - tempo_referencia
     if tempo_referencia>0 and tempo_passado > 2:
         minion = True
+        
+    cronometro = pg.font.SysFont(None, FONTE_MAIOR)
+    Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:2d}',True,(0,0,0))
+    tamanho_cronometro = Cronometro.get_size()
+    largura_cronometro = tamanho_cronometro[0]
+    tela.blit(Cronometro, (LARGURA_TELA//2 - largura_cronometro//2,0.1*ALTURA_TELA))
+    
+    if (agora-comeco>1):
+        tempo[1]-=1
+        if tempo[1]<0:
+            tempo[1]=59
+            tempo[0]-=1
+        comeco = time.time()
+    
+    if(tempo[0] == 0 and tempo[1] == 0):
+        cena_principal = False
+        cena_final = True
 
     #Atualizar a tela
     pg.display.flip()
-
+    #Cena Final 
+    while cena_final:
+        for event in pg.event.get():
+        #Evento de fechar a janela
+           if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
+            sys.exit()
+        titulo = pg.font.SysFont(None,FONTE_TITULO)
+        subtitulo = pg.font.SysFont(None,FONTE_MENOR)
+        Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
+        Subtitulo = subtitulo.render(f'Obrigado por Jogar!', True, (0,0,0))
+        tela.fill((255, 255, 255))
+        PX = LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
+        PY = ALTURA_TELA //2 - Titulo.get_size()[1]
+        px = LARGURA_TELA // 2 - Subtitulo.get_size()[0] // 2
+        py = (PY) + (Subtitulo.get_size()[1] * 2)
+        tela.blit(Titulo, (PX,PY))
+        tela.blit(Subtitulo, (px, py))
+        pg.display.flip()
 
 if __name__ == "__main__":
    main() 
