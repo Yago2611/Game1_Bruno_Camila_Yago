@@ -6,11 +6,14 @@ import configuracoes
 class Cena_Inicial:
   def __init__(self,tela):
     self.tela = tela
-    font_titulo = pg.font.SysFont(None, 12)
-    self.titulo = font_titulo.render(f'Escolha um personagem', True, (0,0,0))
+    #Variaveis booleanas
     self.encerrar = False
     self.escolha_jog1 = False
-    self.escolha_jog2 = False 
+    self.escolha_jog2 = False         
+    #Criando os personagens
+    self.personagem_1 = Personagem("Nikola Tesla", 
+    font_titulo = pg.font.SysFont(None, 12)
+    self.titulo = font_titulo.render(f'Escolha um personagem', True, (0,0,0))
     titulo = pg.font.SysFont(None,FONTE_TITULO)
     escolha = pg.font.SysFont(None, FONTE_MAIOR)
     personagens = pg.font.SysFont(None, FONTE_MENOR)
