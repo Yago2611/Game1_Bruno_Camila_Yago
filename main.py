@@ -125,7 +125,7 @@ def main():
    
    #Cena Principal
    #Análise de eventos
-   tempo = [0,30]
+   tempo = [1,30]
    comeco = time.time()
    while cena_principal:
     for event in pg.event.get():
