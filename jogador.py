@@ -19,6 +19,3 @@ class Jogador:
     self.vy = Configuracoes.VELOCIDADE
   def posicao_na_tela(self):
         self.posicao = (vx, vy)
- 
-      
-# p1 = (pass , PERSONAGENS.nikola_tesla, PERSONAGENS.raios, PERSONAGENS.nikola_tesla)
