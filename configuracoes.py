@@ -5,6 +5,7 @@ Class Configuracoes:
   FONTE_TITULO = 48
   FONTE_SUBTITULO = 12
   NUM_JOGADORES = 2
+  VIDA = 100
   
 
   
