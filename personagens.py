@@ -1,9 +1,10 @@
 import PODERES
 
 class Personagens:
-  def__init__(self, nome, poderes, imagem, vida)
-  self.nome = nikola_tesla
-  self.poderes = poderes
+  def__init__(self, nome, poder1, poder2 imagem, vida)
+  self.nome = nome
+  self.poder1 = poder1
+  self.poder2 = poder2
   self.imagem = imagem
   self.vida = vida 
   
