@@ -261,7 +261,7 @@ def main():
         minion = True
         
     cronometro = pg.font.SysFont(None, FONTE_MAIOR)
-    Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:2d}',True,(0,0,0))
+    Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
     tamanho_cronometro = Cronometro.get_size()
     largura_cronometro = tamanho_cronometro[0]
     tela.blit(Cronometro, (LARGURA_TELA//2 - largura_cronometro//2,0.1*ALTURA_TELA))
