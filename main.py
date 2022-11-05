@@ -16,8 +16,8 @@ def load_image(name, colorkey=None, scale=1.0):
     return image
 
 #Definindo as Configuracoes do jogo
-LARGURA_TELA = 1600 
-ALTURA_TELA = 800
+TELA = pg.display.set_mode()  
+LARGURA_TELA,ALTURA_TELA = TELA.get_size()
 FONTE_TITULO = 96
 FONTE_MAIOR = 48
 FONTE_MENOR = 48
