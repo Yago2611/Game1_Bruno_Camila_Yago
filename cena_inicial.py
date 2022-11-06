@@ -2,7 +2,7 @@ import pygame as pg
 import sys 
 import jogador
 import configuracoes
-import Personagem
+import Personagens
 
 class Cena_Inicial:
   def __init__(self,tela):
@@ -12,8 +12,8 @@ class Cena_Inicial:
     self.escolha_jog1 = False
     self.escolha_jog2 = False         
     #Criando os personagens
-    self.personagem_1 = Personagem("Nikola Tesla",Raio,"Nikola.png",Configuracoes.VIDA)
-    self.personagem_2 = Personagem("Marie Curie",Veneno,"Marie.png",Configuracoes.VIDA)
+    self.personagem_1 = Personagens("Nikola Tesla",Raio,"Nikola.png",Configuracoes.VIDA)
+    self.personagem_2 = Personagens("Marie Curie",Veneno,"Marie.png",Configuracoes.VIDA)
     #Criando os textos
     fonte_titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
     fonte_subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MAIOR)
