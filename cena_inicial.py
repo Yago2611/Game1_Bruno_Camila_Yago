@@ -2,6 +2,7 @@ import pygame as pg
 import sys 
 import jogador
 import configuracoes
+import Personagem
 
 class Cena_Inicial:
   def __init__(self,tela):
