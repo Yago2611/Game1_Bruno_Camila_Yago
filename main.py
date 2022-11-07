@@ -35,8 +35,8 @@ class Jogador:
 
 
     def vida(self):
-        pg.draw.rect(TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
-        pg.draw.rect(TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
+        pg.draw.rect(Configuracoes.TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
+        pg.draw.rect(Configuracoes.TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
 
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
@@ -52,8 +52,8 @@ class Configuracoes:
 class Minions:
     def __init__(self):
         self.valor_logico = True
-        self.px = LARGURA_TELA//2
-        self.py = ALTURA_TELA//2
+        self.px = Configuracoes.LARGURA_TELA//2
+        self.py = Configuracoes.ALTURA_TELA//2
         self.vx = 0
         self.vy = 0 
         self.vida = 100
@@ -87,27 +87,27 @@ def main():
    cena_final = False
 
    #Dados dos jogadores
-   P1_X = 0.1*LARGURA_TELA
-   P1_Y = ALTURA_TELA//2 
-   P2_X = 0.9*LARGURA_TELA
-   P2_Y = ALTURA_TELA//2 
-   px_raio = LARGURA_TELA
-   py_raio = ALTURA_TELA
+   P1_X = 0.1*Configuracoes.LARGURA_TELA
+   P1_Y = Configuracoes.ALTURA_TELA//2 
+   P2_X = 0.9*Configuracoes.LARGURA_TELA
+   P2_Y = Configuracoes.ALTURA_TELA//2 
+   px_raio = Configuracoes.LARGURA_TELA
+   py_raio = Configuracoes.ALTURA_TELA
    v_raio = 0 
-   px_nuvem = LARGURA_TELA
-   py_nuvem = ALTURA_TELA
+   px_nuvem = Configuracoes.LARGURA_TELA
+   py_nuvem = Configuracoes.ALTURA_TELA
    v_nuvem = 0 
     
    #Dados dos minions
-   px_minion = LARGURA_TELA//2
-   py_minion = ALTURA_TELA//2
+   px_minion = Configuracoes.LARGURA_TELA//2
+   py_minion = Configuracoes.ALTURA_TELA//2
    minion = True
    largura_minion = 20
    altura_minion = 50
    tempo_referencia = 0
    
    #Criando a tela 
-   tela = pg.display.set_mode((LARGURA_TELA, ALTURA_TELA)pg.FULLSCREEN)
+   tela = pg.display.set_mode((Configuracoes.LARGURA_TELA, Configuracoes.ALTURA_TELA),pg.FULLSCREEN)
 
    #Cena Inicial
    escolha_jog1 = False
@@ -119,21 +119,21 @@ def main():
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
-    titulo = pg.font.SysFont(None,FONTE_TITULO)
-    escolha = pg.font.SysFont(None, FONTE_MAIOR)
-    personagens = pg.font.SysFont(None, FONTE_MENOR)
+    titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
+    escolha = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
+    personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
     Personagem1 = personagens.render(f'1) Nikola Tesla', True, (0,0,0))
     Personagem2 = personagens.render(f'2) Marie Curie', True, (0,0,0))
     tela.fill((255, 255, 255))
-    PX = LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
-    PY = 0.01 * ALTURA_TELA
-    px = LARGURA_TELA // 2 - Escolha.get_size()[0] // 2
-    py = (0.2 * ALTURA_TELA // 2) + (Escolha.get_size()[1] * 1.5)
-    px_personagens = 0.05*LARGURA_TELA 
-    py1 = (ALTURA_TELA*0.3) + (Personagem1.get_size()[1] * 1.5)
-    py2 = (ALTURA_TELA*0.4) + (Personagem1.get_size()[1] * 1.5)
+    PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
+    PY = 0.01 * Configuracoes.ALTURA_TELA
+    px = Configuracoes.LARGURA_TELA // 2 - Escolha.get_size()[0] // 2
+    py = (0.2 * Configuracoes.ALTURA_TELA // 2) + (Escolha.get_size()[1] * 1.5)
+    px_personagens = 0.05*Configuracoes.LARGURA_TELA 
+    py1 = (Configuracoes.ALTURA_TELA*0.3) + (Personagem1.get_size()[1] * 1.5)
+    py2 = (Configuracoes.ALTURA_TELA*0.4) + (Personagem1.get_size()[1] * 1.5)
     tela.blit(Titulo, (PX,PY))
     tela.blit(Escolha, (px, py))
     tela.blit(Personagem1, (px_personagens, py1))
@@ -198,27 +198,27 @@ def main():
             
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
-      P1_VX = VELOCIDADE
+      P1_VX = Configuracoes.VELOCIDADE
     elif (event.type == pg.KEYDOWN and event.key == pg.K_a) or (pg.key.get_pressed()[pg.K_a]):
-      P1_VX = -VELOCIDADE
+      P1_VX = -Configuracoes.VELOCIDADE
     else:
       P1_VX = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_l) or (pg.key.get_pressed()[pg.K_l]):
-      P2_VX = VELOCIDADE
+      P2_VX = Configuracoes.VELOCIDADE
     elif (event.type == pg.KEYDOWN and event.key == pg.K_j) or (pg.key.get_pressed()[pg.K_j]):
-      P2_VX = -VELOCIDADE
+      P2_VX = -Configuracoes.VELOCIDADE
     else:
       P2_VX = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_s) or (pg.key.get_pressed()[pg.K_s]):
-      P1_VY = VELOCIDADE
+      P1_VY = Configuracoes.VELOCIDADE
     elif (event.type == pg.KEYDOWN and event.key == pg.K_w) or (pg.key.get_pressed()[pg.K_w]):
-      P1_VY = -VELOCIDADE
+      P1_VY = -Configuracoes.VELOCIDADE
     else:
       P1_VY = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_k) or (pg.key.get_pressed()[pg.K_k]):
-      P2_VY = VELOCIDADE
+      P2_VY = Configuracoes.VELOCIDADE
     elif (event.type == pg.KEYDOWN and event.key == pg.K_i) or (pg.key.get_pressed()[pg.K_i]):
-      P2_VY = -VELOCIDADE
+      P2_VY = -Configuracoes.VELOCIDADE
     else:
       P2_VY = 0 
     if (P1_VX!=0) and (P1_VY!=0):
@@ -229,32 +229,32 @@ def main():
       P2_VX *= (2**0.5)/2
     #Mudar a posicao dos jogadores
     Novo_P1_X = P1_X + P1_VX
-    if (Novo_P1_X<=(0.95*(LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P1_X>=0.05*LARGURA_TELA):
+    if (Novo_P1_X<=(0.95*(Configuracoes.LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P1_X>=0.05*Configuracoes.LARGURA_TELA):
       P1_X = Novo_P1_X
     Novo_P2_X = P2_X + P2_VX
-    if (Novo_P2_X<=(0.95*(LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P2_X>=0.05*LARGURA_TELA):
+    if (Novo_P2_X<=(0.95*(Configuracoes.LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P2_X>=0.05*Configuracoes.LARGURA_TELA):
       P2_X = Novo_P2_X
     Novo_P1_Y = P1_Y + P1_VY
-    if (Novo_P1_Y<=(0.9*(ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P1_Y>=0.1*ALTURA_TELA):
+    if (Novo_P1_Y<=(0.9*(Configuracoes.ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P1_Y>=0.1*Configuracoes.ALTURA_TELA):
       P1_Y = Novo_P1_Y
     Novo_P2_Y = P2_Y + P2_VY
-    if (Novo_P2_Y<=(0.9*(ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P2_Y>=0.1*ALTURA_TELA):
+    if (Novo_P2_Y<=(0.9*(Configuracoes.ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P2_Y>=0.1*Configuracoes.ALTURA_TELA):
       P2_Y = Novo_P2_Y
     
     #Desenhar a tela
     tela.fill((0, 0, 255))
-    pg.draw.rect(tela,(0, 255, 0),(0.05*LARGURA_TELA, 0.1*ALTURA_TELA, 0.9*LARGURA_TELA, 0.8*ALTURA_TELA),0)
+    pg.draw.rect(tela,(0, 255, 0),(0.05*Configuracoes.LARGURA_TELA, 0.1*Configuracoes.ALTURA_TELA, 0.9*Configuracoes.LARGURA_TELA, 0.8*Configuracoes.ALTURA_TELA),0)
     #Pegar uma imagem
     tela.blit(imagem1, (P1_X,P1_Y))
     tela.blit(imagem2, (P2_X,P2_Y))
     #Desenha os jogadores
-    ida_atual = 100
+    vida_atual = 100
     vida_maxima = 200
     comprimento_barra_vida = 50
     razao_vida = vida_maxima / comprimento_barra_vida
 
-    pg.draw.rect(TELA, (255,0,0), (Novo_P1_X,Novo_P1_Y-20,vida_atual/razao_vida,10))
-    pg.draw.rect(TELA, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
+    pg.draw.rect(tela, (255,0,0), (Novo_P1_X,Novo_P1_Y-20,vida_atual/razao_vida,10))
+    pg.draw.rect(tela, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
     #Minions
     if minion.valor:
         minion.velocidade()
@@ -266,20 +266,20 @@ def main():
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
       px_raio = P1_X
       py_raio = P1_Y
-      v_raio = VELOCIDADE
+      v_raio = Configuracoes.VELOCIDADE
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
       px_raio = P1_X
       py_raio = P1_Y
-      v_raio = -VELOCIDADE
+      v_raio = -Configuracoes.VELOCIDADE
 
     if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
       px_nuvem = P2_X
       py_nuvem = P2_Y
-      v_nuvem = VELOCIDADE
+      v_nuvem = Configuracoes.VELOCIDADE
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
       px_nuvem = P2_X
       py_nuvem = P2_Y
-      v_nuvem = -VELOCIDADE
+      v_nuvem = -Configuracoes.VELOCIDADE
 
     tela.blit(imagem_raio, (px_raio,py_raio))
     px_raio += v_raio
@@ -312,11 +312,11 @@ def main():
     if tempo_referencia>0 and tempo_passado > 2:
         minion = True
         
-    cronometro = pg.font.SysFont(None, FONTE_MAIOR)
+    cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
     tamanho_cronometro = Cronometro.get_size()
     largura_cronometro = tamanho_cronometro[0]
-    tela.blit(Cronometro, (LARGURA_TELA//2 - largura_cronometro//2,0.1*ALTURA_TELA))
+    tela.blit(Cronometro, (Configuracoes.LARGURA_TELA//2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
     
     if (agora-comeco>1):
         tempo[1]-=1
@@ -337,14 +337,14 @@ def main():
         #Evento de fechar a janela
            if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             sys.exit()
-        titulo = pg.font.SysFont(None,FONTE_TITULO)
-        subtitulo = pg.font.SysFont(None,FONTE_MENOR)
+        titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
+        subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
         Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
         Subtitulo = subtitulo.render(f'Obrigado por Jogar!', True, (0,0,0))
         tela.fill((255, 255, 255))
-        PX = LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
-        PY = ALTURA_TELA //2 - Titulo.get_size()[1]
-        px = LARGURA_TELA // 2 - Subtitulo.get_size()[0] // 2
+        PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
+        PY = Configuracoes.ALTURA_TELA //2 - Titulo.get_size()[1]
+        px = Configuracoes.LARGURA_TELA // 2 - Subtitulo.get_size()[0] // 2
         py = (PY) + (Subtitulo.get_size()[1] * 2)
         tela.blit(Titulo, (PX,PY))
         tela.blit(Subtitulo, (px, py))
