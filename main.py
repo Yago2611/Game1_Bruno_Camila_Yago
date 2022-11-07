@@ -15,30 +15,28 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
-class Jogador:  
-    def __init__ (self,posicao,personagem):
-    self.posicao = posicao
-    self.personagem = personagem #O jogador ira receber um objeto da classe personagem
-    self.vida = personagem.vida
-    self.vx = 0
-    self.vy = 0
-
-  def mover_cima(self):
-    self.vx = -Configuracoes.VELOCIDADE
-  def mover_baixo(self):
-    self.vx = Configuracoes.VELOCIDADE
-  def mover_esquerda(self):
-    self.vy = -Configuracoes.VELOCIDADE
-  def mover_direita(self):
-    self.vy = Configuracoes.VELOCIDADE
-  def posicao_na_tela(self):
-        self.posicao = (vx, vy)
-
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
     self.imagem = imagem
     self.poder = poder
+    
+class Jogador:  
+    def __init__ (self,posicao,personagem):
+      self.posicao = posicao
+      self.personagem = personagem #O jogador ira receber um objeto da classe personagem
+      self.vida = personagem.vida
+      self.vx = 0
+      self.vy = 0
+      self.vida_atual = 100
+      self.vida_maxima = 200
+      self.comprimento_barra_vida = 50
+      self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
+
+
+    def vida(self):
+        pg.draw.rect(TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
+        pg.draw.rect(TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
 
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
@@ -249,7 +247,13 @@ def main():
     tela.blit(imagem1, (P1_X,P1_Y))
     tela.blit(imagem2, (P2_X,P2_Y))
     #Desenha os jogadores
-    
+    ida_atual = 100
+    vida_maxima = 200
+    comprimento_barra_vida = 50
+    razao_vida = vida_maxima / comprimento_barra_vida
+
+    pg.draw.rect(TELA, (255,0,0), (Novo_P1_X,Novo_P1_Y-20,vida_atual/razao_vida,10))
+    pg.draw.rect(TELA, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
     #Minions
     if minion:
         tela.blit(imagem_minion, (px_minion,py_minion))
