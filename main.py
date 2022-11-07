@@ -21,8 +21,8 @@ class Poder:
         self.valor = False
         self.px = 0 
         self.py = 0
-        self.largura = self.imagem.get_rect[0]
-        self.altura = self.imagem.get_rect[1]
+        self.largura = self.imagem.get_rect().width
+        self.altura = self.imagem.get_rect().height
         self.vx = 1
         self.vy = 0 
     def lancar (self,jogador):
@@ -39,10 +39,13 @@ class Personagem:
     self.nome = nome
     self.imagem = imagem
     self.poder = poder
+    self.vida = 100
     
 class Jogador:  
-    def __init__ (self,posicao,personagem):
-      self.posicao = posicao
+    def __init__ (self,py,px,personagem):
+      self.py = py
+      self.px = px 
+      self.poder = personagem.poder
       self.personagem = personagem #O jogador ira receber um objeto da classe personagem
       self.vida = personagem.vida
       self.vx = 0
@@ -77,8 +80,9 @@ class Minions:
         self.vy = 0 
         self.vida = 100
         self.imagem = load_image('minion.png', scale=1)
-        self.largura = self.imagem.get_rect[0]
-        self.altura = self.imagem.get_rect[1]
+        self.largura = self.imagem.get_rect().width
+        self.altura = self.imagem.get_rect().height
+        self.vel = 0 
     def velocidade(self,jogador1,jogador2):
         if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
             self.vx = jogador1.px - self.px
@@ -86,9 +90,9 @@ class Minions:
         else:
             self.vx = jogador2.px - self.px
             self.vy = jogador2.py - self.py
-        self.velocidade = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
-        self.vx /= self.velocidade
-        self.vy /= self.velocidade #Formamos os vetores unitarios
+        self.vel = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
+        self.vx /= self.vel
+        self.vy /= self.vel #Formamos os vetores unitarios
     def movimento(self):
         self.px += self.vx
         self.py += self.vy 
@@ -110,12 +114,6 @@ def main():
    P1_Y = Configuracoes.ALTURA_TELA//2 
    P2_X = 0.9*Configuracoes.LARGURA_TELA
    P2_Y = Configuracoes.ALTURA_TELA//2 
-   px_raio = Configuracoes.LARGURA_TELA
-   py_raio = Configuracoes.ALTURA_TELA
-   v_raio = 0 
-   px_nuvem = Configuracoes.LARGURA_TELA
-   py_nuvem = Configuracoes.ALTURA_TELA
-   v_nuvem = 0 
     
    #Dados dos minions
    minion = Minions()
@@ -276,25 +274,25 @@ def main():
     pg.draw.rect(tela, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
     #Minions
     if minion.valor:
-        minion.velocidade()
+        minion.velocidade(jogador1,jogador2)
         minion.movimento()
-        minion.desenha()
+        minion.desenha(tela)
 
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      jogador1.poder.lancar()
+      jogador1.poder.lancar(jogador1)
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
-      jogador1.poder.lancar()
+      jogador1.poder.lancar(jogador1)
     if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
-      jogador1.poder.lancar()
+      jogador2.poder.lancar(jogador2)
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
-      jogador1.poder.lancar()
+      jogador2.poder.lancar(jogador2)
 
     if jogador1.poder.valor == True: 
-        jogador1.poder.desenha()
+        jogador1.poder.desenha(tela)
     if jogador2.poder.valor == True: 
-        jogador2.poder.desenha()
+        jogador2.poder.desenha(tela)
 
     if (jogador1.poder.px+jogador1.poder.largura>=minion.px and jogador1.poder.px<=minion.px+minion.largura) and (jogador1.poder.py+jogador1.poder.altura>=minion.py and jogador1.poder.py<=minion.py+minion.altura):
         minion.valor = False
