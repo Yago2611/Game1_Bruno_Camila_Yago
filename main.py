@@ -49,30 +49,58 @@ class Configuracoes:
     nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
     marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
 
-if (event.type == pg.KEYDOWN and event.key == pg.K_DOWN):
-        if posicao>=0 and posicao<1:
-            posicao+=1
-        time.sleep(0.1)
+class Minions:
+    def __init__(self):
+        self.valor_logico = True
+        self.px = LARGURA_TELA//2
+        self.py = ALTURA_TELA//2
+        self.vx = 0
+        self.vy = 0 
+        self.vida = 100
+        self.imagem = load_image('minion.png', scale=1)
+        self.largura = self.imagem.get_rect[0]
+        self.altura = self.imagem.get_rect[1]
+    def velocidade(self,jogador1,jogador2):
+        if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
+            self.vx = jogador1.px - self.px
+            self.vy = jogador1.py - self.py
+        else:
+            self.vx = jogador2.px - self.px
+            self.vy = jogador2.py - self.py
+        self.velocidade = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
+        self.vx /= self.velocidade
+        self.vy /= self.velocidade #Formamos os vetores unitarios
+    def movimento(self):
+        self.px += self.vx
+        self.py += self.vy 
+    def desenha(self,tela):
+        tela.blit(self.imagem, (self.px,self.py))class Minions:
+    def __init__(self):
+        self.valor_logico = True
+        self.px = LARGURA_TELA//2
+        self.py = ALTURA_TELA//2
+        self.vx = 0
+        self.vy = 0 
+        self.vida = 100
+        self.imagem = load_image('minion.png', scale=1)
+        self.largura = self.imagem.get_rect[0]
+        self.altura = self.imagem.get_rect[1]
+    def velocidade(self,jogador1,jogador2):
+        if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
+            self.vx = jogador1.px - self.px
+            self.vy = jogador1.py - self.py
+        else:
+            self.vx = jogador2.px - self.px
+            self.vy = jogador2.py - self.py
+        self.velocidade = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
+        self.vx /= self.velocidade
+        self.vy /= self.velocidade #Formamos os vetores unitarios
+    def movimento(self):
+        self.px += self.vx
+        self.py += self.vy 
+    def desenha(self,tela):
+        tela.blit(self.imagem, (self.px,self.py))
         
-    elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
-        if posicao>0 and posicao<=1:
-            posicao-=1
-        time.sleep(0.1)
-
-    if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        if posicao == 0:
-          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
-        if posicao == 1:
-          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
-        escolha_jog1 = True
-        time.sleep(0.2)
-    elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        if posicao == 0:
-          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
-        if posicao == 1:
-          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
-        escolha_jog2 = True
-        time.sleep(0.2)
 
     
 
@@ -255,18 +283,10 @@ def main():
     pg.draw.rect(TELA, (255,0,0), (Novo_P1_X,Novo_P1_Y-20,vida_atual/razao_vida,10))
     pg.draw.rect(TELA, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
     #Minions
-    if minion:
-        tela.blit(imagem_minion, (px_minion,py_minion))
-    
-    #Velocidade
-    vx_minion = P1_X - px_minion
-    vy_minion = P1_Y - py_minion 
-    velocidade_minion = ((vx_minion**2 + vy_minion**2)**0.5)/2
-    if (velocidade_minion!=0):
-        vx_minion/=velocidade_minion
-        vy_minion/=velocidade_minion
-    px_minion += vx_minion
-    py_minion += vy_minion
+    if minion.valor:
+        minion.velocidade()
+        minion.movimento()
+        minion.desenha()
 
 
     #Poder
