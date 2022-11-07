@@ -70,7 +70,7 @@ class Configuracoes:
 
 class Minions:
     def __init__(self):
-        self.valor_logico = True
+        self.valor = True
         self.px = Configuracoes.LARGURA_TELA//2
         self.py = Configuracoes.ALTURA_TELA//2
         self.vx = 0
@@ -118,11 +118,7 @@ def main():
    v_nuvem = 0 
     
    #Dados dos minions
-   px_minion = Configuracoes.LARGURA_TELA//2
-   py_minion = Configuracoes.ALTURA_TELA//2
-   minion = True
-   largura_minion = 20
-   altura_minion = 50
+   minion = Minion()
    tempo_referencia = 0
    
    #Criando a tela 
@@ -229,9 +225,6 @@ def main():
             sys.exit()
     imagem1 = load_image('nikola.png', scale=1)
     imagem2 = load_image('marie.png', scale=1)
-    imagem_minion = load_image('minion.png', scale=1)
-    imagem_raio = load_image('raio.png',scale=0.1)
-    imagem_nuvem = load_image('nuvem.png',scale=0.1)
     rect = imagem1.get_rect()
     LARGURA_JOGADOR = rect.width
     ALTURA_JOGADOR = rect.height
@@ -304,45 +297,25 @@ def main():
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      px_raio = P1_X
-      py_raio = P1_Y
-      v_raio = Configuracoes.VELOCIDADE
+      jogador1.poder.lancar()
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
-      px_raio = P1_X
-      py_raio = P1_Y
-      v_raio = -Configuracoes.VELOCIDADE
-
+      jogador1.poder.lancar()
     if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
-      px_nuvem = P2_X
-      py_nuvem = P2_Y
-      v_nuvem = Configuracoes.VELOCIDADE
+      jogador1.poder.lancar()
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
-      px_nuvem = P2_X
-      py_nuvem = P2_Y
-      v_nuvem = -Configuracoes.VELOCIDADE
+      jogador1.poder.lancar()
 
-    tela.blit(imagem_raio, (px_raio,py_raio))
-    px_raio += v_raio
-    px_raio += v_raio
-
-    tamanho = imagem_raio.get_rect()
-    largura_raio = tamanho.width
-    altura_raio = tamanho.height
-
-    tela.blit(imagem_nuvem, (px_nuvem,py_nuvem))
-    px_nuvem += v_nuvem
-    px_nuvem += v_nuvem
-
-    tamanho2 = imagem_nuvem.get_rect()
-    largura_nuvem = tamanho2.width
-    altura_nuvem = tamanho2.height
+    if jogador1.poder.valor == True: 
+        jogador1.poder.desenha()
+    if jogador2.poder.valor == True: 
+        jogador2.poder.desenha()
 
     if (px_raio+altura_raio>=px_minion and px_raio<=px_minion+largura_minion) and (py_raio+largura_raio>=py_minion and py_raio<=py_minion+altura_minion):
-        minion = False
+        minion.valor = False
         tempo_referencia = time.time()
     
     if (px_nuvem+altura_nuvem>=px_minion and px_nuvem<=px_minion+largura_minion) and (py_nuvem+largura_nuvem>=py_minion and py_nuvem<=py_minion+altura_minion):
-        minion = False
+        minion.valor = False
         tempo_referencia = time.time()
 
     tempo_atual = time.time()
@@ -350,7 +323,7 @@ def main():
     if tempo_referencia>0:
         tempo_passado = tempo_atual - tempo_referencia
     if tempo_referencia>0 and tempo_passado > 2:
-        minion = True
+        minion.valor = True
         
     cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
