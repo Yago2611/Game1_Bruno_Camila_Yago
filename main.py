@@ -60,7 +60,7 @@ def main():
    tempo_referencia = 0
    
    #Criando a tela 
-   tela = pg.display.set_mode((LARGURA_TELA, ALTURA_TELA))
+   tela = pg.display.set_mode((LARGURA_TELA, ALTURA_TELA)pg.FULLSCREEN)
 
    #Cena Inicial
    escolha_jog1 = False
