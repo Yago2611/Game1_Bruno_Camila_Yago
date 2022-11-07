@@ -15,6 +15,25 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
+class Poder: 
+    def __init__(self,imagem):
+        self.imagem = load_image(imagem, scale=0.1)
+        self.valor = False
+        self.px = Null 
+        self.py = Null
+        self.largura = self.imagem.get_rect[0]
+        self.altura = self.imagem.get_rect[1]
+        self.vx = 1
+        self.vy = 0 
+    def lancar (self,jogador):
+        self.valor = True
+        self.px = jogador.px
+        self.py = jogador.py 
+        self.px+=self.vx
+        self.py+=self.vy
+    def desenha (self,tela):
+        tela.blit(self.imagem,(self.px,self.py))
+
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
