@@ -19,8 +19,8 @@ class Poder:
     def __init__(self,imagem):
         self.imagem = load_image(imagem, scale=0.1)
         self.valor = False
-        self.px = Null 
-        self.py = Null
+        self.px = 0 
+        self.py = 0
         self.largura = self.imagem.get_rect[0]
         self.altura = self.imagem.get_rect[1]
         self.vx = 1
@@ -118,7 +118,7 @@ def main():
    v_nuvem = 0 
     
    #Dados dos minions
-   minion = Minion()
+   minion = Minions()
    tempo_referencia = 0
    
    #Criando a tela 
@@ -165,31 +165,17 @@ def main():
         time.sleep(0.1)
 
     if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        escolha_jog1 = True
-        time.sleep(0.2)
-    elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        escolha_jog2 = True
-        time.sleep(0.2)
-
-
-    #Escolha dos personagens
-     elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
-        if posicao>0 and posicao<=1:
-            posicao-=1
-        time.sleep(0.1)
-
-    if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.nikola_tesla)
         if posicao == 1:
-          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.marie_curie)
         escolha_jog1 = True
         time.sleep(0.2)
     elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.nikola_tesla)
         if posicao == 1:
-          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.marie_curie)
         escolha_jog2 = True
         time.sleep(0.2)
 
@@ -310,11 +296,11 @@ def main():
     if jogador2.poder.valor == True: 
         jogador2.poder.desenha()
 
-    if (px_raio+altura_raio>=px_minion and px_raio<=px_minion+largura_minion) and (py_raio+largura_raio>=py_minion and py_raio<=py_minion+altura_minion):
+    if (jogador1.poder.px+jogador1.poder.largura>=minion.px and jogador1.poder.px<=minion.px+minion.largura) and (jogador1.poder.py+jogador1.poder.altura>=minion.py and jogador1.poder.py<=minion.py+minion.altura):
         minion.valor = False
         tempo_referencia = time.time()
     
-    if (px_nuvem+altura_nuvem>=px_minion and px_nuvem<=px_minion+largura_minion) and (py_nuvem+largura_nuvem>=py_minion and py_nuvem<=py_minion+altura_minion):
+    if (jogador2.poder.px+jogador2.poder.largura>=minion.px and jogador2.poder.px<=minion.px+minion.largura) and (jogador2.poder.py+jogador2.poder.altura>=minion.py and jogador2.poder.py<=minion.py+minion.altura):
         minion.valor = False
         tempo_referencia = time.time()
 
