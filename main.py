@@ -51,8 +51,6 @@ class Jogador:
       self.vida_maxima = 200
       self.comprimento_barra_vida = 50
       self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
-
-
     def vida(self):
         pg.draw.rect(Configuracoes.TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
         pg.draw.rect(Configuracoes.TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
@@ -65,6 +63,8 @@ class Configuracoes:
     FONTE_MAIOR = 48
     FONTE_MENOR = 48
     VELOCIDADE = 5
+    raios = Poder("raio.png")
+    nuvem = Poder("nuvem.png")
     nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
     marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
 
