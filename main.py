@@ -15,39 +15,48 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
-#Definindo as Configuracoes do jogo
-TELA = pg.display.set_mode()  
-LARGURA_TELA,ALTURA_TELA = TELA.get_size()
-FONTE_TITULO = 96
-FONTE_MAIOR = 48
-FONTE_MENOR = 48
-VELOCIDADE = 5
-
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
     self.imagem = imagem
     self.poder = poder
-    self.hp = 100
-    
-class Jogador:  
-    def __init__ (self,posicao,personagem):
-    self.posicao = posicao
-    self.personagem = personagem #O jogador ira receber um objeto da classe personagem
-    self.vida = personagem.vida
-    self.vx = 0
-    self.vy = 0
 
-  def mover_cima(self):
-    self.vx = -Configuracoes.VELOCIDADE
-  def mover_baixo(self):
-    self.vx = Configuracoes.VELOCIDADE
-  def mover_esquerda(self):
-    self.vy = -Configuracoes.VELOCIDADE
-  def mover_direita(self):
-    self.vy = Configuracoes.VELOCIDADE
-  def posicao_na_tela(self):
-        self.posicao = (vx, vy)
+class Configuracoes:   
+    #Definindo as Configuracoes do jogo
+    TELA = pg.display.set_mode()  
+    LARGURA_TELA,ALTURA_TELA = TELA.get_size()
+    FONTE_TITULO = 96
+    FONTE_MAIOR = 48
+    FONTE_MENOR = 48
+    VELOCIDADE = 5
+    nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
+    marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
+
+if (event.type == pg.KEYDOWN and event.key == pg.K_DOWN):
+        if posicao>=0 and posicao<1:
+            posicao+=1
+        time.sleep(0.1)
+        
+    elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
+        if posicao>0 and posicao<=1:
+            posicao-=1
+        time.sleep(0.1)
+
+    if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+        if posicao == 0:
+          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+        if posicao == 1:
+          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+        escolha_jog1 = True
+        time.sleep(0.2)
+    elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+        if posicao == 0:
+          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+        if posicao == 1:
+          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+        escolha_jog2 = True
+        time.sleep(0.2)
+
     
 
 def main():
@@ -221,7 +230,6 @@ def main():
     tela.blit(imagem1, (P1_X,P1_Y))
     tela.blit(imagem2, (P2_X,P2_Y))
     #Desenha os jogadores
-    
     
     #Minions
     if minion:
