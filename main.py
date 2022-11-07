@@ -74,35 +74,8 @@ class Minions:
         self.px += self.vx
         self.py += self.vy 
     def desenha(self,tela):
-        tela.blit(self.imagem, (self.px,self.py))class Minions:
-    def __init__(self):
-        self.valor_logico = True
-        self.px = LARGURA_TELA//2
-        self.py = ALTURA_TELA//2
-        self.vx = 0
-        self.vy = 0 
-        self.vida = 100
-        self.imagem = load_image('minion.png', scale=1)
-        self.largura = self.imagem.get_rect[0]
-        self.altura = self.imagem.get_rect[1]
-    def velocidade(self,jogador1,jogador2):
-        if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
-            self.vx = jogador1.px - self.px
-            self.vy = jogador1.py - self.py
-        else:
-            self.vx = jogador2.px - self.px
-            self.vy = jogador2.py - self.py
-        self.velocidade = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
-        self.vx /= self.velocidade
-        self.vy /= self.velocidade #Formamos os vetores unitarios
-    def movimento(self):
-        self.px += self.vx
-        self.py += self.vy 
-    def desenha(self,tela):
         tela.blit(self.imagem, (self.px,self.py))
         
-
-    
 
 def main():
 
