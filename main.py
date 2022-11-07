@@ -15,26 +15,6 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
-class Poder: 
-    def __init__(self,imagem):
-        self.imagem = load_image(imagem, scale=0.1)
-        self.valor = False
-        self.px = Null 
-        self.py = Null
-        self.largura = self.imagem.get_rect[0]
-        self.altura = self.imagem.get_rect[1]
-        self.vx = 1
-        self.vy = 0 
-    def lancar (self,jogador):
-        self.valor = True
-        self.px = jogador.px
-        self.py = jogador.py 
-        self.px+=self.vx
-        self.py+=self.vy
-    def desenha (self,tela):
-        tela.blit(self.imagem,(self.px,self.py))
-        
-
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
@@ -66,8 +46,6 @@ class Configuracoes:
     FONTE_MAIOR = 48
     FONTE_MENOR = 48
     VELOCIDADE = 5
-    raios = Poder("raio.png")
-    nuvem = Poder("nuvem.png")
     nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
     marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
 
@@ -120,7 +98,13 @@ def main():
    py_nuvem = Configuracoes.ALTURA_TELA
    v_nuvem = 0 
     
-   minion = Minion()
+   #Dados dos minions
+   px_minion = Configuracoes.LARGURA_TELA//2
+   py_minion = Configuracoes.ALTURA_TELA//2
+   minion = True
+   largura_minion = 20
+   altura_minion = 50
+   tempo_referencia = 0
    
    #Criando a tela 
    tela = pg.display.set_mode((Configuracoes.LARGURA_TELA, Configuracoes.ALTURA_TELA),pg.FULLSCREEN)
@@ -174,6 +158,27 @@ def main():
 
 
     #Escolha dos personagens
+     elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
+        if posicao>0 and posicao<=1:
+            posicao-=1
+        time.sleep(0.1)
+
+    if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+        if posicao == 0:
+          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+        if posicao == 1:
+          jogador1 = Jogador(0.1*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+        escolha_jog1 = True
+        time.sleep(0.2)
+    elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+        if posicao == 0:
+          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,nikola_tesla)
+        if posicao == 1:
+          jogador2 = Jogador(0.9*LARGURA_TELA,ALTURA_TELA//2,marie_curie)
+        escolha_jog2 = True
+        time.sleep(0.2)
+
+
     if posicao == 0 and escolha_jog1 == False:
         Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))    
         tela.blit(Personagem1, (px_personagens, py1))
@@ -205,6 +210,9 @@ def main():
             sys.exit()
     imagem1 = load_image('nikola.png', scale=1)
     imagem2 = load_image('marie.png', scale=1)
+    imagem_minion = load_image('minion.png', scale=1)
+    imagem_raio = load_image('raio.png',scale=0.1)
+    imagem_nuvem = load_image('nuvem.png',scale=0.1)
     rect = imagem1.get_rect()
     LARGURA_JOGADOR = rect.width
     ALTURA_JOGADOR = rect.height
@@ -277,14 +285,22 @@ def main():
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      jogador1.poder.lancar()
+      px_raio = P1_X
+      py_raio = P1_Y
+      v_raio = Configuracoes.VELOCIDADE
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
-      jogador1.poder.lancar()
+      px_raio = P1_X
+      py_raio = P1_Y
+      v_raio = -Configuracoes.VELOCIDADE
 
     if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
-      jogador2.poder.lancar()
+      px_nuvem = P2_X
+      py_nuvem = P2_Y
+      v_nuvem = Configuracoes.VELOCIDADE
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
-      jogador2.poder.lancar()
+      px_nuvem = P2_X
+      py_nuvem = P2_Y
+      v_nuvem = -Configuracoes.VELOCIDADE
 
     tela.blit(imagem_raio, (px_raio,py_raio))
     px_raio += v_raio
@@ -303,11 +319,11 @@ def main():
     altura_nuvem = tamanho2.height
 
     if (px_raio+altura_raio>=px_minion and px_raio<=px_minion+largura_minion) and (py_raio+largura_raio>=py_minion and py_raio<=py_minion+altura_minion):
-        minion.valor = False
+        minion = False
         tempo_referencia = time.time()
     
     if (px_nuvem+altura_nuvem>=px_minion and px_nuvem<=px_minion+largura_minion) and (py_nuvem+largura_nuvem>=py_minion and py_nuvem<=py_minion+altura_minion):
-        minion.valor = False
+        minion = False
         tempo_referencia = time.time()
 
     tempo_atual = time.time()
@@ -315,7 +331,7 @@ def main():
     if tempo_referencia>0:
         tempo_passado = tempo_atual - tempo_referencia
     if tempo_referencia>0 and tempo_passado > 2:
-        minion.valor = True
+        minion = True
         
     cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
