@@ -23,6 +23,13 @@ FONTE_MAIOR = 48
 FONTE_MENOR = 48
 VELOCIDADE = 5
 
+class Personagem:
+   def __init__(self, nome, imagem, poder):
+    self.nome = nome
+    self.imagem = imagem
+    self.poder = poder
+    
+
 def main():
 
    #Inicializando o pygame
@@ -105,7 +112,7 @@ def main():
 
     #Escolha dos personagens
     if posicao == 0 and escolha_jog1 == False:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))
+        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))    
         tela.blit(Personagem1, (px_personagens, py1))
     elif posicao == 0 and escolha_jog1:
         Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 2]', True, (122,122,0))
