@@ -73,9 +73,9 @@ class Jogador:
       self.vida_maxima = 200
       self.comprimento_barra_vida = 50
       self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
-    def desenha_vida(self):
-        pg.draw.rect(Configuracoes.TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
-        pg.draw.rect(Configuracoes.TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)
+    def desenha_vida(self,tela):
+        pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
+        pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)
     def cima(self):
       self.vy = - Configuracoes.VELOCIDADE 
     def baixo(self):
