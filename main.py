@@ -91,7 +91,7 @@ class Minions:
         else:
             self.vx = jogador2.px - self.px
             self.vy = jogador2.py - self.py
-        self.vel = ((self.vx**2 + self.vy**2)**0.5)/2 #Encontramos o modulo do vetor velocidade
+        self.vel = ((self.vx**2 + self.vy**2)**0.5)/Configuracoes.VELOCIDADE #Encontramos o modulo do vetor velocidade
         self.vx /= self.vel
         self.vy /= self.vel #Formamos os vetores unitarios
     def movimento(self):
