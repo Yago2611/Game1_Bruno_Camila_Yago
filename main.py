@@ -38,26 +38,9 @@ class Poder:
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
-    self.imagem = imagem
+    self.imagem = load_image(imagem, scale=1)
     self.poder = poder
     self.vida = 100
-    
-class Jogador:  
-    def __init__ (self,px,py,personagem):
-      self.py = py
-      self.px = px 
-      self.poder = personagem.poder
-      self.personagem = personagem #O jogador ira receber um objeto da classe personagem
-      self.vida = personagem.vida
-      self.vx = 0
-      self.vy = 0
-      self.vida_atual = 100
-      self.vida_maxima = 200
-      self.comprimento_barra_vida = 50
-      self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
-    def vida(self):
-        pg.draw.rect(Configuracoes.TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
-        pg.draw.rect(Configuracoes.TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
 
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
@@ -66,11 +49,48 @@ class Configuracoes:
     FONTE_TITULO = 96
     FONTE_MAIOR = 48
     FONTE_MENOR = 48
-    VELOCIDADE = 5
+    VELOCIDADE = 1
     raios = Poder("raio.png")
     nuvem = Poder("nuvem.png")
     nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
     marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
+
+class Jogador:  
+    def __init__ (self,px,py,personagem):
+      self.px = px 
+      self.py = py
+      self.poder = personagem.poder
+      self.vida = personagem.vida
+      self.nome = personagem.nome
+      self.imagem = personagem.imagem
+      self.largura = self.imagem.get_rect().width
+      self.altura = self.imagem.get_rect().height
+      self.vx = 0
+      self.vy = 0
+      self.vida_atual = 100
+      self.vida_maxima = 200
+      self.comprimento_barra_vida = 50
+      self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
+    def desenha_vida(self):
+        pg.draw.rect(Configuracoes.TELA, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
+        pg.draw.rect(Configuracoes.TELA, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)
+    def cima(self):
+      self.vy = - Configuracoes.VELOCIDADE 
+    def baixo(self):
+      self.vy = Configuracoes.VELOCIDADE
+    def esquerda(self):
+      self.vx = - Configuracoes.VELOCIDADE
+    def direita(self):
+      self.vx = Configuracoes.VELOCIDADE
+    def diagonal(self):
+      modulo = (((self.vx)**2+(self.vy)**2)**0.5)/Configuracoes.VELOCIDADE
+      self.vx /= modulo  
+      self.vy /= modulo
+    def movimento(self):
+      self.px+=self.vx
+      self.py+=self.vy
+    def desenha(self,tela):
+      tela.blit(self.imagem,(self.px,self.py))
 
 class Minions:
     def __init__(self):
@@ -86,12 +106,13 @@ class Minions:
         self.vel = 0 
     def velocidade(self,jogador1,jogador2):
         if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
-            self.vx = jogador1.px - self.px
-            self.vy = jogador1.py - self.py
+          self.vx = jogador2.px - self.px
+          self.vy = jogador2.py - self.py
         else:
-            self.vx = jogador2.px - self.px
-            self.vy = jogador2.py - self.py
-        self.vel = ((self.vx**2 + self.vy**2)**0.5)/Configuracoes.VELOCIDADE #Encontramos o modulo do vetor velocidade
+          self.vx = jogador1.px - self.px
+          self.vy = jogador1.py - self.py
+       #Encontramos o modulo do vetor velocidade
+        self.vel = ((self.vx**2 + self.vy**2)**0.5)/(0.8*Configuracoes.VELOCIDADE)
         self.vx /= self.vel
         self.vy /= self.vel #Formamos os vetores unitarios
     def movimento(self):
@@ -109,12 +130,6 @@ def main():
    cena_inicial = True
    cena_principal = False
    cena_final = False
-
-   #Dados dos jogadores
-   P1_X = 0.1*Configuracoes.LARGURA_TELA
-   P1_Y = Configuracoes.ALTURA_TELA//2 
-   P2_X = 0.9*Configuracoes.LARGURA_TELA
-   P2_Y = Configuracoes.ALTURA_TELA//2 
     
    #Dados dos minions
    minion = Minions()
@@ -178,7 +193,6 @@ def main():
         escolha_jog2 = True
         time.sleep(0.2)
 
-
     if posicao == 0 and escolha_jog1 == False:
         Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))    
         tela.blit(Personagem1, (px_personagens, py1))
@@ -208,71 +222,56 @@ def main():
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
-    imagem1 = load_image('nikola.png', scale=1)
-    imagem2 = load_image('marie.png', scale=1)
-    rect = imagem1.get_rect()
-    LARGURA_JOGADOR = rect.width
-    ALTURA_JOGADOR = rect.height
             
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
-      P1_VX = Configuracoes.VELOCIDADE
+      jogador1.direita()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_a) or (pg.key.get_pressed()[pg.K_a]):
-      P1_VX = -Configuracoes.VELOCIDADE
+      jogador1.esquerda()
     else:
-      P1_VX = 0 
+      jogador1.vx = 0
     if (event.type == pg.KEYDOWN and event.key == pg.K_l) or (pg.key.get_pressed()[pg.K_l]):
-      P2_VX = Configuracoes.VELOCIDADE
+      jogador2.direita()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_j) or (pg.key.get_pressed()[pg.K_j]):
-      P2_VX = -Configuracoes.VELOCIDADE
+      jogador2.esquerda()
     else:
-      P2_VX = 0 
+      jogador2.vx = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_s) or (pg.key.get_pressed()[pg.K_s]):
-      P1_VY = Configuracoes.VELOCIDADE
+      jogador1.baixo()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_w) or (pg.key.get_pressed()[pg.K_w]):
-      P1_VY = -Configuracoes.VELOCIDADE
+      jogador1.cima()
     else:
-      P1_VY = 0 
+      jogador1.vy = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_k) or (pg.key.get_pressed()[pg.K_k]):
-      P2_VY = Configuracoes.VELOCIDADE
+      jogador2.baixo()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_i) or (pg.key.get_pressed()[pg.K_i]):
-      P2_VY = -Configuracoes.VELOCIDADE
+      jogador2.cima()
     else:
-      P2_VY = 0 
-    if (P1_VX!=0) and (P1_VY!=0):
-      P1_VY *= (2**0.5)/2
-      P1_VX *= (2**0.5)/2
-    if (P2_VX!=0) and (P2_VY!=0):
-      P2_VY *= (2**0.5)/2
-      P2_VX *= (2**0.5)/2
+      jogador2.vy = 0  
+    if (jogador1.vx!=0) and (jogador1.vy!=0):
+      jogador1.diagonal()
+    if (jogador2.vx!=0) and (jogador2.vy!=0):
+      jogador2.diagonal()
     #Mudar a posicao dos jogadores
-    Novo_P1_X = P1_X + P1_VX
-    if (Novo_P1_X<=(0.95*(Configuracoes.LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P1_X>=0.05*Configuracoes.LARGURA_TELA):
-      P1_X = Novo_P1_X
-    Novo_P2_X = P2_X + P2_VX
-    if (Novo_P2_X<=(0.95*(Configuracoes.LARGURA_TELA)-LARGURA_JOGADOR)) and (Novo_P2_X>=0.05*Configuracoes.LARGURA_TELA):
-      P2_X = Novo_P2_X
-    Novo_P1_Y = P1_Y + P1_VY
-    if (Novo_P1_Y<=(0.9*(Configuracoes.ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P1_Y>=0.1*Configuracoes.ALTURA_TELA):
-      P1_Y = Novo_P1_Y
-    Novo_P2_Y = P2_Y + P2_VY
-    if (Novo_P2_Y<=(0.9*(Configuracoes.ALTURA_TELA)-ALTURA_JOGADOR)) and (Novo_P2_Y>=0.1*Configuracoes.ALTURA_TELA):
-      P2_Y = Novo_P2_Y
+    jogador1.movimento()
+    jogador2.movimento()
     
     #Desenhar a tela
     tela.fill((0, 0, 255))
     pg.draw.rect(tela,(0, 255, 0),(0.05*Configuracoes.LARGURA_TELA, 0.1*Configuracoes.ALTURA_TELA, 0.9*Configuracoes.LARGURA_TELA, 0.8*Configuracoes.ALTURA_TELA),0)
     #Pegar uma imagem
-    tela.blit(imagem1, (P1_X,P1_Y))
-    tela.blit(imagem2, (P2_X,P2_Y))
+    jogador1.desenha(tela)
+    jogador2.desenha(tela)
     #Desenha os jogadores
     vida_atual = 100
     vida_maxima = 200
     comprimento_barra_vida = 50
     razao_vida = vida_maxima / comprimento_barra_vida
 
-    pg.draw.rect(tela, (255,0,0), (Novo_P1_X,Novo_P1_Y-20,vida_atual/razao_vida,10))
-    pg.draw.rect(tela, (255,255,255),(Novo_P1_X,Novo_P1_Y-20,comprimento_barra_vida,10),2)
+    pg.draw.rect(tela, (255,0,0), (jogador1.px,jogador1.py-20,vida_atual/razao_vida,10))
+    pg.draw.rect(tela, (255,255,255),(jogador1.px,jogador1.py-20,comprimento_barra_vida,10),2)
+
+
     #Minions
     if minion.valor:
         minion.velocidade(jogador1,jogador2)
