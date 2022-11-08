@@ -69,7 +69,7 @@ class Jogador:
       self.altura = self.imagem.get_rect().height
       self.vx = 0
       self.vy = 0
-      self.vida_atual = 100
+      self.vida_atual = 200
       self.vida_maxima = 200
       self.comprimento_barra_vida = 50
       self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
@@ -106,7 +106,7 @@ class Minions:
         self.altura = self.imagem.get_rect().height
         self.vel = 0 
         self.vida_atual = 100
-        self.vida_maxima = 200
+        self.vida_maxima = 100
         self.comprimento_barra_vida = 50
         self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
     
@@ -278,6 +278,9 @@ def main():
     #Pegar uma imagem
     jogador1.desenha(tela)
     jogador2.desenha(tela)
+    jogador1.desenha_vida(tela)
+    jogador2.desenha_vida(tela)
+
     #Desenha os jogadores
 
     #Minions
@@ -307,7 +310,7 @@ def main():
   
     fisica = Fisica()
     if fisica.contato(jogador2, jogador1.poder):
-      vida_atual2 -= 50 
+      jogador2.vida_atual = jogador2.vida_atual-1
 
     if fisica.contato(minion,jogador1.poder):
         minion.valor = False
