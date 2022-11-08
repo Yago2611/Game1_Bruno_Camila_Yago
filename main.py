@@ -106,6 +106,14 @@ class Minions:
         self.largura = self.imagem.get_rect().width
         self.altura = self.imagem.get_rect().height
         self.vel = 0 
+        self.vida_atual = 100
+        self.vida_maxima = 200
+        self.comprimento_barra_vida = 50
+        self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
+    
+    def vida(self,tela):
+        pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
+        pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
     def velocidade(self,jogador1,jogador2):
         if (((jogador1.px-self.px)**2 + (jogador1.py-self.py)**2)**0.5) > (((jogador2.px-self.px)**2 + (jogador2.py-self.py)**2)**0.5): #Comparamos a distancia com os jogadores
           self.vx = jogador2.px - self.px
@@ -272,20 +280,14 @@ def main():
     jogador1.desenha(tela)
     jogador2.desenha(tela)
     #Desenha os jogadores
-    vida_atual = 100
-    vida_maxima = 200
-    comprimento_barra_vida = 50
-    razao_vida = vida_maxima / comprimento_barra_vida
-
-    pg.draw.rect(tela, (255,0,0), (jogador1.px,jogador1.py-20,vida_atual/razao_vida,10))
-    pg.draw.rect(tela, (255,255,255),(jogador1.px,jogador1.py-20,comprimento_barra_vida,10),2)
-
 
     #Minions
     if minion.valor:
         minion.velocidade(jogador1,jogador2)
         minion.movimento()
-        minion.desenha(tela)
+        minion.desenha(tela) 
+        minion.vida(tela)
+               
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
@@ -303,8 +305,10 @@ def main():
     if jogador2.poder.valor == True:
         jogador2.poder.movimento()
         jogador2.poder.desenha(tela)
-
+  
     fisica = Fisica()
+    if fisica.contato(jogador2, jogador1.poder):
+      vida_atual2 -= 50 
 
     if fisica.contato(minion,jogador1.poder):
         minion.valor = False
