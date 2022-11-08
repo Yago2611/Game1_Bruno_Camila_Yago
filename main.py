@@ -15,6 +15,21 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
+class Configuracoes:   
+    #Definindo as Configuracoes do jogo
+    TELA = pg.display.set_mode()  
+    LARGURA_TELA,ALTURA_TELA = TELA.get_size()
+    FONTE_TITULO = 96
+    FONTE_MAIOR = 48
+    FONTE_MENOR = 48
+    VELOCIDADE = 1
+
+class Fisica:
+    def __init__(self):
+      pass
+    def contato(self,corpo1,corpo2):
+      return (corpo1.px+corpo1.largura>=corpo2.px and corpo1.px<=corpo2.px+corpo2.largura) and (corpo1.py+corpo1.altura>=corpo2.py and corpo1.py<=corpo2.py+corpo2.altura)
+
 class Poder: 
     def __init__(self,imagem):
         self.imagem = load_image(imagem, scale=0.1)
@@ -23,7 +38,7 @@ class Poder:
         self.py = 0
         self.largura = self.imagem.get_rect().width
         self.altura = self.imagem.get_rect().height
-        self.vx = 1
+        self.vx = Configuracoes.VELOCIDADE
         self.vy = 0 
     def lancar (self,jogador):
         self.valor = True
@@ -41,19 +56,6 @@ class Personagem:
     self.imagem = load_image(imagem, scale=1)
     self.poder = poder
     self.vida = 100
-
-class Configuracoes:   
-    #Definindo as Configuracoes do jogo
-    TELA = pg.display.set_mode()  
-    LARGURA_TELA,ALTURA_TELA = TELA.get_size()
-    FONTE_TITULO = 96
-    FONTE_MAIOR = 48
-    FONTE_MENOR = 48
-    VELOCIDADE = 1
-    raios = Poder("raio.png")
-    nuvem = Poder("nuvem.png")
-    nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
-    marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
 
 class Jogador:  
     def __init__ (self,px,py,personagem):
@@ -124,12 +126,19 @@ class Minions:
 
 def main():
 
-   #Inicializando o pygame
+  #Inicializando o pygame
    pg.init()
     
    cena_inicial = True
    cena_principal = False
    cena_final = False
+
+   #Dados
+   
+   raios = Poder("raio.png")
+   nuvem = Poder("nuvem.png")
+   nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
+   marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
     
    #Dados dos minions
    minion = Minions()
@@ -180,16 +189,16 @@ def main():
 
     if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.nikola_tesla)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,nikola_tesla)
         if posicao == 1:
-          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.marie_curie)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,marie_curie)
         escolha_jog1 = True
         time.sleep(0.2)
     elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.nikola_tesla)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,nikola_tesla)
         if posicao == 1:
-          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Configuracoes.marie_curie)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,marie_curie)
         escolha_jog2 = True
         time.sleep(0.2)
 
@@ -278,7 +287,6 @@ def main():
         minion.movimento()
         minion.desenha(tela)
 
-
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
       jogador1.poder.lancar(jogador1)
@@ -296,11 +304,13 @@ def main():
         jogador2.poder.movimento()
         jogador2.poder.desenha(tela)
 
-    if (jogador1.poder.px+jogador1.poder.largura>=minion.px and jogador1.poder.px<=minion.px+minion.largura) and (jogador1.poder.py+jogador1.poder.altura>=minion.py and jogador1.poder.py<=minion.py+minion.altura):
+    fisica = Fisica()
+
+    if fisica.contato(minion,jogador1.poder):
         minion.valor = False
         tempo_referencia = time.time()
     
-    if (jogador2.poder.px+jogador2.poder.largura>=minion.px and jogador2.poder.px<=minion.px+minion.largura) and (jogador2.poder.py+jogador2.poder.altura>=minion.py and jogador2.poder.py<=minion.py+minion.altura):
+    if fisica.contato(minion, jogador2.poder):
         minion.valor = False
         tempo_referencia = time.time()
 
