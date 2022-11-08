@@ -23,7 +23,7 @@ class Poder:
         self.py = 0
         self.largura = self.imagem.get_rect().width
         self.altura = self.imagem.get_rect().height
-        self.vx = Configuracoes.VELOCIDADE
+        self.vx = 1
         self.vy = 0 
     def lancar (self,jogador):
         self.valor = True
