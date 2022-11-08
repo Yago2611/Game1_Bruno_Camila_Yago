@@ -101,7 +101,6 @@ class Minions:
         self.py = Configuracoes.ALTURA_TELA//2
         self.vx = 0
         self.vy = 0 
-        self.vida = 100
         self.imagem = load_image('minion.png', scale=1)
         self.largura = self.imagem.get_rect().width
         self.altura = self.imagem.get_rect().height
