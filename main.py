@@ -23,12 +23,13 @@ class Poder:
         self.py = 0
         self.largura = self.imagem.get_rect().width
         self.altura = self.imagem.get_rect().height
-        self.vx = 1
+        self.vx = Configuracoes.VELOCIDADE
         self.vy = 0 
     def lancar (self,jogador):
         self.valor = True
         self.px = jogador.px
         self.py = jogador.py 
+    def movimento(self):
         self.px+=self.vx
         self.py+=self.vy
     def desenha (self,tela):
@@ -42,7 +43,7 @@ class Personagem:
     self.vida = 100
     
 class Jogador:  
-    def __init__ (self,py,px,personagem):
+    def __init__ (self,px,py,personagem):
       self.py = py
       self.px = px 
       self.poder = personagem.poder
@@ -290,8 +291,10 @@ def main():
       jogador2.poder.lancar(jogador2)
 
     if jogador1.poder.valor == True: 
+        jogador1.poder.movimento()
         jogador1.poder.desenha(tela)
-    if jogador2.poder.valor == True: 
+    if jogador2.poder.valor == True:
+        jogador2.poder.movimento()
         jogador2.poder.desenha(tela)
 
     if (jogador1.poder.px+jogador1.poder.largura>=minion.px and jogador1.poder.px<=minion.px+minion.largura) and (jogador1.poder.py+jogador1.poder.altura>=minion.py and jogador1.poder.py<=minion.py+minion.altura):
