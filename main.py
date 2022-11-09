@@ -30,6 +30,15 @@ class Fisica:
     def contato(self,corpo1,corpo2):
       return (corpo1.px+corpo1.largura>=corpo2.px and corpo1.px<=corpo2.px+corpo2.largura) and (corpo1.py+corpo1.altura>=corpo2.py and corpo1.py<=corpo2.py+corpo2.altura)
 
+class Mapa:
+    def __init__(self):
+      self.terra_plana = (0.05*Configuracoes.LARGURA_TELA, 0.1*Configuracoes.ALTURA_TELA, 0.9*Configuracoes.LARGURA_TELA, 0.8*Configuracoes.ALTURA_TELA)
+    def limite(self,corpo):
+      return (corpo.px <= 0.05*Configuracoes.LARGURA_TELA or corpo.px + corpo.largura >= 0.95*Configuracoes.LARGURA_TELA or corpo.py <= 0.1*Configuracoes.ALTURA_TELA or corpo.py + corpo.altura >= 0.9*Configuracoes.ALTURA_TELA)
+    def desenha(self,tela):
+      tela.fill((0, 0, 255))
+      pg.draw.rect(tela,(0, 255, 0),self.terra_plana,0)
+
 class Poder: 
     def __init__(self,imagem):
         self.imagem = load_image(imagem, scale=0.1)
@@ -61,6 +70,7 @@ class Jogador:
     def __init__ (self,px,py,personagem):
       self.px = px 
       self.py = py
+      self.personagem = personagem
       self.poder = personagem.poder
       self.vida = personagem.vida
       self.nome = personagem.nome
@@ -88,9 +98,21 @@ class Jogador:
       modulo = (((self.vx)**2+(self.vy)**2)**0.5)/Configuracoes.VELOCIDADE
       self.vx /= modulo  
       self.vy /= modulo
-    def movimento(self):
-      self.px+=self.vx
-      self.py+=self.vy
+    def movimento(self,corpos):
+      mapa = Mapa()
+      fisica = Fisica()
+      novo_px = self.px + self.vx
+      novo_py = self.py + self.vy
+      jogador_teste = Jogador(novo_px,novo_py,self.personagem)
+      for corpo in corpos:
+        if fisica.contato(jogador_teste,corpo):
+          valor = True
+          break
+        else:
+          valor = False 
+      if not mapa.limite(jogador_teste) and not valor:
+        self.px = novo_px
+        self.py = novo_py
     def desenha(self,tela):
       tela.blit(self.imagem,(self.px,self.py))
 
@@ -110,7 +132,7 @@ class Minions:
         self.comprimento_barra_vida = 50
         self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
     
-    def vida(self,tela):
+    def desenha_vida(self,tela):
         pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
         pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
     def velocidade(self,jogador1,jogador2):
@@ -124,9 +146,23 @@ class Minions:
         self.vel = ((self.vx**2 + self.vy**2)**0.5)/(0.8*Configuracoes.VELOCIDADE)
         self.vx /= self.vel
         self.vy /= self.vel #Formamos os vetores unitarios
-    def movimento(self):
-        self.px += self.vx
-        self.py += self.vy 
+    def movimento(self,corpos):
+        mapa = Mapa()
+        fisica = Fisica()
+        novo_px = self.px + self.vx
+        novo_py = self.py + self.vy
+        minion_teste = Minions()
+        minion_teste.px = novo_px
+        minion_teste.py = novo_py
+        for corpo in corpos:
+          if fisica.contato(minion_teste,corpo):
+            valor = True
+            break
+          else:
+            valor = False 
+          if not mapa.limite(minion_teste) and not valor:
+            self.px = novo_px
+            self.py = novo_py 
     def desenha(self,tela):
         tela.blit(self.imagem, (self.px,self.py))
         
@@ -148,8 +184,7 @@ def main():
    marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
     
    #Dados dos minions
-   minion = Minions()
-   tempo_referencia = 0
+   minions = []
    
    #Criando a tela 
    tela = pg.display.set_mode((Configuracoes.LARGURA_TELA, Configuracoes.ALTURA_TELA),pg.FULLSCREEN)
@@ -232,6 +267,7 @@ def main():
    #Análise de eventos
    tempo = [1,30]
    comeco = time.time()
+   inicio = time.time()
    while cena_principal:
     for event in pg.event.get():
         #Evento de fechar a janela
@@ -239,6 +275,8 @@ def main():
             print("Encerrando o programa.")
             sys.exit()
             
+    agora = time.time()        
+    
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
       jogador1.direita()
@@ -269,12 +307,12 @@ def main():
     if (jogador2.vx!=0) and (jogador2.vy!=0):
       jogador2.diagonal()
     #Mudar a posicao dos jogadores
-    jogador1.movimento()
-    jogador2.movimento()
+    jogador1.movimento([jogador2])
+    jogador2.movimento([jogador1])
     
     #Desenhar a tela
-    tela.fill((0, 0, 255))
-    pg.draw.rect(tela,(0, 255, 0),(0.05*Configuracoes.LARGURA_TELA, 0.1*Configuracoes.ALTURA_TELA, 0.9*Configuracoes.LARGURA_TELA, 0.8*Configuracoes.ALTURA_TELA),0)
+    mapa = Mapa()
+    mapa.desenha(tela)
     #Pegar uma imagem
     jogador1.desenha(tela)
     jogador2.desenha(tela)
@@ -284,11 +322,22 @@ def main():
     #Desenha os jogadores
 
     #Minions
-    if minion.valor:
-        minion.velocidade(jogador1,jogador2)
-        minion.movimento()
-        minion.desenha(tela) 
-        minion.vida(tela)
+    if agora - inicio > 3:
+      minion = Minions()
+      minions.append(minion)
+      inicio = agora
+    for minion in minions:
+      if minion.valor:
+          if fisica.contato(minion,jogador1.poder):
+            minion.valor = False
+          if fisica.contato(minion, jogador2.poder):
+            minion.valor = False
+          minion.velocidade(jogador1,jogador2)
+          minion.movimento([jogador1,jogador2])
+          minion.desenha(tela) 
+          minion.desenha_vida(tela)
+      else:
+        minions.remove(minion)
                
 
     #Poder
@@ -311,22 +360,11 @@ def main():
     fisica = Fisica()
     if fisica.contato(jogador2, jogador1.poder):
       jogador2.vida_atual = jogador2.vida_atual-1
+    if fisica.contato(jogador1,jogador2.poder):
+      jogador1.vida_atual = jogador1.vida_atual-1
 
-    if fisica.contato(minion,jogador1.poder):
-        minion.valor = False
-        tempo_referencia = time.time()
-    
-    if fisica.contato(minion, jogador2.poder):
-        minion.valor = False
-        tempo_referencia = time.time()
-
-    tempo_atual = time.time()
     agora = time.time()
-    if tempo_referencia>0:
-        tempo_passado = tempo_atual - tempo_referencia
-    if tempo_referencia>0 and tempo_passado > 2:
-        minion.valor = True
-        
+       
     cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
     tamanho_cronometro = Cronometro.get_size()
