@@ -160,9 +160,9 @@ class Minions:
             break
           else:
             valor = False 
-          if not mapa.limite(minion_teste) and not valor:
-            self.px = novo_px
-            self.py = novo_py 
+        if not mapa.limite(minion_teste) and not valor:
+          self.px = novo_px
+          self.py = novo_py 
     def desenha(self,tela):
         tela.blit(self.imagem, (self.px,self.py))
         
