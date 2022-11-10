@@ -20,7 +20,6 @@ class Configuracoes:
     TELA = pg.display.set_mode()  
     LARGURA_TELA,ALTURA_TELA = TELA.get_size()
     FONTE_TITULO = 96
-    FONTE_MAIOR = 48
     FONTE_MENOR = 48
     VELOCIDADE = 1
 
@@ -39,25 +38,31 @@ class Mapa:
       tela.fill((0, 0, 255))
       pg.draw.rect(tela,(0, 255, 0),self.terra_plana,0)
 
-class Poder: 
-    def __init__(self,imagem):
-        self.imagem = load_image(imagem, scale=0.1)
+class Poder:
+  def __init__(self,imagem):
+    self.imagem = load_image(imagem, scale=0.1)
+    self.px,self.py = 0,0
+    self.valor = False
+    self.vx = 0
+    self.vy = 0
+    self.largura,self.altura = self.imagem.get_rect().width,self.imagem.get_rect().height
+  def lancar(self,jogador):
+    self.valor = True
+    jogador.vetor_direcao()
+    self.vx = jogador.vetorx
+    self.vy = jogador.vetory
+    self.px = jogador.px
+    self.py = jogador.py 
+  def movimento(self):
+    if self.valor:
+      self.px += self.vx
+      self.py += self.vy
+  def dano(self,corpo):
+    if self.px+self.altura>=corpo.px and self.px<=corpo.px+corpo.largura and (self.py+self.largura>=corpo.py and self.py<=corpo.py+corpo.altura):
+        corpo.vida -= 50
         self.valor = False
-        self.px = 0 
-        self.py = 0
-        self.largura = self.imagem.get_rect().width
-        self.altura = self.imagem.get_rect().height
-        self.vx = Configuracoes.VELOCIDADE
-        self.vy = 0 
-    def lancar (self,jogador):
-        self.valor = True
-        self.px = jogador.px
-        self.py = jogador.py 
-    def movimento(self):
-        self.px+=self.vx
-        self.py+=self.vy
-    def desenha (self,tela):
-        tela.blit(self.imagem,(self.px,self.py))
+  def desenha(self,tela):
+    tela.blit(self.imagem, (self.px,self.py))
 
 class Personagem:
    def __init__(self, nome, imagem, poder):
@@ -77,6 +82,8 @@ class Jogador:
       self.imagem = personagem.imagem
       self.largura = self.imagem.get_rect().width
       self.altura = self.imagem.get_rect().height
+      self.vetorx = Configuracoes.VELOCIDADE
+      self.vetory = 0 
       self.vx = 0
       self.vy = 0
       self.vida_atual = 200
@@ -105,17 +112,24 @@ class Jogador:
       novo_py = self.py + self.vy
       jogador_teste = Jogador(novo_px,novo_py,self.personagem)
       for corpo in corpos:
-        if fisica.contato(jogador_teste,corpo):
-          valor = True
+        for ente in corpo:
+          if fisica.contato(jogador_teste,ente):
+            valor = True
+            break
+          else:
+            valor = False 
+        if valor:
           break
-        else:
-          valor = False 
       if not mapa.limite(jogador_teste) and not valor:
         self.px = novo_px
         self.py = novo_py
     def desenha(self,tela):
       tela.blit(self.imagem,(self.px,self.py))
-
+    def vetor_direcao(self):
+      if not (self.vx == 0 and self.vy ==0):
+        self.vetorx = self.vx
+        self.vetory = self.vy
+    
 class Minions:
     def __init__(self):
         self.valor = True
@@ -131,7 +145,6 @@ class Minions:
         self.vida_maxima = 100
         self.comprimento_barra_vida = 50
         self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
-    
     def desenha_vida(self,tela):
         pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
         pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
@@ -155,39 +168,34 @@ class Minions:
         minion_teste.px = novo_px
         minion_teste.py = novo_py
         for corpo in corpos:
-          if fisica.contato(minion_teste,corpo):
-            valor = True
+          for ente in corpo:
+            if fisica.contato(minion_teste,ente):
+              valor = True
+              break
+            else:
+              valor = False 
+          if valor:
             break
-          else:
-            valor = False 
         if not mapa.limite(minion_teste) and not valor:
           self.px = novo_px
           self.py = novo_py 
     def desenha(self,tela):
         tela.blit(self.imagem, (self.px,self.py))
-        
 
 def main():
 
-  #Inicializando o pygame
+   #Inicializando o pygame
    pg.init()
     
    cena_inicial = True
    cena_principal = False
    cena_final = False
-
-   #Dados
-   
-   raios = Poder("raio.png")
-   nuvem = Poder("nuvem.png")
-   nikola_tesla = Personagem("Nikola Tesla", "nikola.png", raios)
-   marie_curie = Personagem("Marie Curie", "marie.png", nuvem)
     
    #Dados dos minions
    minions = []
    
    #Criando a tela 
-   tela = pg.display.set_mode((Configuracoes.LARGURA_TELA, Configuracoes.ALTURA_TELA),pg.FULLSCREEN)
+   tela = pg.display.set_mode((0,0),pg.FULLSCREEN)
 
    #Cena Inicial
    escolha_jog1 = False
@@ -200,12 +208,16 @@ def main():
             print("Encerrando o programa.")
             sys.exit()
     titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
-    escolha = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
+    escolha = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
+    Raio = Poder("raio.png")
+    Nuvem = Poder("nuvem.png")
+    Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
+    Marie = Personagem("Marie Curie","marie.png",Nuvem)
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
-    Personagem1 = personagens.render(f'1) Nikola Tesla', True, (0,0,0))
-    Personagem2 = personagens.render(f'2) Marie Curie', True, (0,0,0))
+    Personagem1 = personagens.render(f'1) {Nikola.nome}', True, (0,0,0))
+    Personagem2 = personagens.render(f'2) {Marie.nome}', True, (0,0,0))
     tela.fill((255, 255, 255))
     PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
     PY = 0.01 * Configuracoes.ALTURA_TELA
@@ -231,21 +243,23 @@ def main():
 
     if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,nikola_tesla)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Nikola)
         if posicao == 1:
-          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,marie_curie)
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Marie)
         escolha_jog1 = True
         time.sleep(0.2)
     elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
-          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,nikola_tesla)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Nikola)
         if posicao == 1:
-          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,marie_curie)
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Marie)
         escolha_jog2 = True
         time.sleep(0.2)
 
+
+    #Escolha dos personagens
     if posicao == 0 and escolha_jog1 == False:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))    
+        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))
         tela.blit(Personagem1, (px_personagens, py1))
     elif posicao == 0 and escolha_jog1:
         Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 2]', True, (122,122,0))
@@ -275,15 +289,13 @@ def main():
             print("Encerrando o programa.")
             sys.exit()
             
-    agora = time.time()        
-    
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
       jogador1.direita()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_a) or (pg.key.get_pressed()[pg.K_a]):
       jogador1.esquerda()
     else:
-      jogador1.vx = 0
+      jogador1.vx = 0 
     if (event.type == pg.KEYDOWN and event.key == pg.K_l) or (pg.key.get_pressed()[pg.K_l]):
       jogador2.direita()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_j) or (pg.key.get_pressed()[pg.K_j]):
@@ -295,20 +307,20 @@ def main():
     elif (event.type == pg.KEYDOWN and event.key == pg.K_w) or (pg.key.get_pressed()[pg.K_w]):
       jogador1.cima()
     else:
-      jogador1.vy = 0 
+      jogador1.vy = 0  
     if (event.type == pg.KEYDOWN and event.key == pg.K_k) or (pg.key.get_pressed()[pg.K_k]):
       jogador2.baixo()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_i) or (pg.key.get_pressed()[pg.K_i]):
       jogador2.cima()
     else:
-      jogador2.vy = 0  
+      jogador2.vy = 0 
     if (jogador1.vx!=0) and (jogador1.vy!=0):
       jogador1.diagonal()
     if (jogador2.vx!=0) and (jogador2.vy!=0):
       jogador2.diagonal()
     #Mudar a posicao dos jogadores
-    jogador1.movimento([jogador2])
-    jogador2.movimento([jogador1])
+    jogador1.movimento([[jogador2],minions])
+    jogador2.movimento([[jogador1],minions])
     
     #Desenhar a tela
     mapa = Mapa()
@@ -319,7 +331,19 @@ def main():
     jogador1.desenha_vida(tela)
     jogador2.desenha_vida(tela)
 
-    #Desenha os jogadores
+    #Poder
+    if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
+      jogador1.poder.lancar(jogador1)
+    if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
+      jogador1.poder.lancar(jogador1)
+
+    if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
+      jogador2.poder.lancar(jogador2)
+    if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
+      jogador2.poder.lancar(jogador2)
+
+    fisica = Fisica()
+    agora = time.time()
 
     #Minions
     if agora - inicio > 3:
@@ -329,47 +353,37 @@ def main():
     for minion in minions:
       if minion.valor:
           if fisica.contato(minion,jogador1.poder):
-            minion.valor = False
+            minion.vida_atual -= 1
           if fisica.contato(minion, jogador2.poder):
-            minion.valor = False
+            minion.vida_atual -= 1
           minion.velocidade(jogador1,jogador2)
-          minion.movimento([jogador1,jogador2])
+          minions_teste = minions[:]
+          minions_teste.remove(minion)
+          minion.movimento([[jogador1,jogador2],minions_teste])
           minion.desenha(tela) 
           minion.desenha_vida(tela)
+          if minion.vida_atual <= 0:
+            minion.valor = False
       else:
         minions.remove(minion)
-               
+    
+    if jogador1.poder.valor:
+      jogador1.poder.movimento()
+      jogador1.poder.desenha(tela)
+    if jogador2.poder.valor:
+      jogador2.poder.movimento()
+      jogador2.poder.desenha(tela)
 
-    #Poder
-    if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      jogador1.poder.lancar(jogador1)
-    if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
-      jogador1.poder.lancar(jogador1)
-    if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
-      jogador2.poder.lancar(jogador2)
-    if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
-      jogador2.poder.lancar(jogador2)
-
-    if jogador1.poder.valor == True: 
-        jogador1.poder.movimento()
-        jogador1.poder.desenha(tela)
-    if jogador2.poder.valor == True:
-        jogador2.poder.movimento()
-        jogador2.poder.desenha(tela)
-  
-    fisica = Fisica()
     if fisica.contato(jogador2, jogador1.poder):
       jogador2.vida_atual = jogador2.vida_atual-1
     if fisica.contato(jogador1,jogador2.poder):
       jogador1.vida_atual = jogador1.vida_atual-1
-
-    agora = time.time()
-       
-    cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MAIOR)
+        
+    cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
     tamanho_cronometro = Cronometro.get_size()
     largura_cronometro = tamanho_cronometro[0]
-    tela.blit(Cronometro, (Configuracoes.LARGURA_TELA//2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
+    tela.blit(Cronometro, (Configuracoes.LARGURA_TELA /2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
     
     if (agora-comeco>1):
         tempo[1]-=1
@@ -378,7 +392,7 @@ def main():
             tempo[0]-=1
         comeco = time.time()
     
-    if(tempo[0] == 0 and tempo[1] == 0):
+    if(tempo[0] == 0 and tempo[1] == 0) or jogador1.vida_atual<=0 or jogador2.vida_atual<=0:
         cena_principal = False
         cena_final = True
 
@@ -393,12 +407,17 @@ def main():
         titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
         subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
         Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
-        Subtitulo = subtitulo.render(f'Obrigado por Jogar!', True, (0,0,0))
+        if jogador1.vida_atual>0 and jogador2.vida_atual>0:
+          Subtitulo = subtitulo.render(f'Empate Técnico',True,(0,0,0))
+        elif jogador2.vida_atual<=0:
+          Subtitulo = subtitulo.render(f'O Melhor Cientista da Historia: {jogador1.nome} [Jogador 1]', True, (0,0,0))
+        else:
+          Subtitulo = subtitulo.render(f'O Melhor Cientista da Historia: {jogador2.nome} [Jogador 2]', True, (0,0,0))
         tela.fill((255, 255, 255))
         PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
         PY = Configuracoes.ALTURA_TELA //2 - Titulo.get_size()[1]
         px = Configuracoes.LARGURA_TELA // 2 - Subtitulo.get_size()[0] // 2
-        py = (PY) + (Subtitulo.get_size()[1] * 2)
+        py = (PY) + (Subtitulo.get_size()[1] * 3)
         tela.blit(Titulo, (PX,PY))
         tela.blit(Subtitulo, (px, py))
         pg.display.flip()
