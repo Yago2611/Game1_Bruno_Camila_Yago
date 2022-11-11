@@ -15,7 +15,7 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
-def lista_animacao(imagem):
+def animacao_movimento(imagem):
   lista = []
   px = 14
   py = 515
@@ -31,6 +31,17 @@ def lista_animacao(imagem):
     px = 14
     py+=64
   return lista
+def animacao_morte(imagem):
+  lista = []
+  px = 14
+  py = 1291
+  largura = 43
+  altura = 53
+  for j in range(6):
+      subimagem = imagem.subsurface(pg.Rect(px,py,largura,altura))
+      lista.append(subimagem)
+      px+=63
+  return lista
 
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
@@ -39,6 +50,8 @@ class Configuracoes:
     FONTE_TITULO = 96
     FONTE_MENOR = 48
     VELOCIDADE = 1
+    MINIONS_ANIMACAO_MOVIMENTO = animacao_movimento(load_image("minions.png",scale=1))
+    MINIONS_ANIMACAO_MORTE = animacao_morte(load_image("minions.png",scale=1))
 
 class Fisica:
     def __init__(self):
@@ -83,7 +96,8 @@ class Poder:
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
-    self.imagem = lista_animacao(load_image(imagem,scale=1))
+    self.animacao = animacao_movimento(load_image(imagem,scale=1))
+    self.animacao_morte = animacao_morte(load_image(imagem,scale=1))
     self.poder = poder
     self.vida = 100
 
@@ -96,8 +110,9 @@ class Jogador:
       self.poder = personagem.poder
       self.vida = personagem.vida
       self.nome = personagem.nome
-      self.imagem = personagem.imagem
-      self.imagem_principal = self.imagem[0][0]
+      self.animacao = personagem.animacao
+      self.animacao_morte = personagem.animacao_morte
+      self.imagem_principal = self.animacao[0][0]
       self.largura = self.imagem_principal.get_rect().width
       self.altura = self.imagem_principal.get_rect().height
       self.vetorx = Configuracoes.VELOCIDADE
@@ -124,50 +139,57 @@ class Jogador:
       self.vx /= modulo  
       self.vy /= modulo
     def movimento(self,corpos):
-      mapa = Mapa()
-      fisica = Fisica()
-      novo_px = self.px + self.vx
-      novo_py = self.py + self.vy
-      jogador_teste = Jogador(novo_px,novo_py,self.personagem)
-      for corpo in corpos:
-        for ente in corpo:
-          if fisica.contato(jogador_teste,ente):
-            valor = True
+      if self.vida_atual>0:
+        mapa = Mapa()
+        fisica = Fisica()
+        novo_px = self.px + self.vx
+        novo_py = self.py + self.vy
+        jogador_teste = Jogador(novo_px,novo_py,self.personagem)
+        for corpo in corpos:
+          for ente in corpo:
+            if fisica.contato(jogador_teste,ente):
+              valor = True
+              break
+            else:
+              valor = False 
+          if valor:
             break
-          else:
-            valor = False 
-        if valor:
-          break
-      if not mapa.limite(jogador_teste) and not valor:
-        self.px = novo_px
-        self.py = novo_py
+        if not mapa.limite(jogador_teste) and not valor:
+          self.px = novo_px
+          self.py = novo_py
     def desenha(self,tela):
-      self.vetor_direcao()
-      if self.vy<0:
-        n = 0
-      elif self.vx<0:
-        n = 1
-      elif self.vy>0:
-        n = 2
-      elif self.vx>0:
-        n = 3
+      if self.vida_atual>0:
+        self.vetor_direcao()
+        if self.vy<0:
+          n = 0
+        elif self.vx<0:
+          n = 1
+        elif self.vy>0:
+          n = 2
+        elif self.vx>0:
+          n = 3
+        else:
+          n = -1
+        if self.frame>8:
+          self.frame = 0
+        if n>=0:
+          tela.blit(self.animacao[n][self.frame],(self.px,self.py))
+        if self.vx == 0 and self.vy == 0:
+            if self.vetory <0:
+              tela.blit(self.animacao[0][0],(self.px,self.py))
+            elif self.vetorx < 0:
+              tela.blit(self.animacao[1][0],(self.px,self.py))
+            elif self.vetory > 0:
+              tela.blit(self.animacao[2][0],(self.px,self.py))
+            elif self.vetorx > 0:
+              tela.blit(self.animacao[3][0],(self.px,self.py))
+            else:
+              tela.blit(self.animacao[n][self.frame],(self.px,self.py))
       else:
-        n = -1
-      if self.frame>8:
-        self.frame = 0
-      if n>=0:
-        tela.blit(self.imagem[n][self.frame],(self.px,self.py))
-      if self.vx == 0 and self.vy == 0:
-          if self.vetory <0:
-            tela.blit(self.imagem[0][0],(self.px,self.py))
-          elif self.vetorx < 0:
-            tela.blit(self.imagem[1][0],(self.px,self.py))
-          elif self.vetory > 0:
-            tela.blit(self.imagem[2][0],(self.px,self.py))
-          elif self.vetorx > 0:
-            tela.blit(self.imagem[3][0],(self.px,self.py))
-          else:
-            tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+        if self.frame>5:
+          self.frame = 5
+        tela.blit(self.animacao_morte[self.frame],(self.px,self.py))
+            
     def vetor_direcao(self):
       if not (self.vx == 0 and self.vy ==0):
         self.vetorx = self.vx
@@ -181,11 +203,13 @@ class Minions:
         self.py = Configuracoes.ALTURA_TELA//2
         self.vx = 0
         self.vy = 0
+        self.tempo_morte = 0 
         self.vetorx = Configuracoes.VELOCIDADE
         self.vetory = 0 
-        self.imagem = lista_animacao(load_image("minions.png",scale=1))
-        self.largura = self.imagem[0][0].get_rect().width
-        self.altura = self.imagem[0][0].get_rect().height
+        self.animacao = Configuracoes.MINIONS_ANIMACAO_MOVIMENTO
+        self.animacao_morte = Configuracoes.MINIONS_ANIMACAO_MORTE
+        self.largura = self.animacao[0][0].get_rect().width
+        self.altura = self.animacao[0][0].get_rect().height
         self.vel = 0 
         self.vida_atual = 100
         self.vida_maxima = 100
@@ -206,6 +230,7 @@ class Minions:
         self.vx /= self.vel
         self.vy /= self.vel #Formamos os vetores unitarios
     def movimento(self,corpos):
+      if self.vida_atual>0:
         mapa = Mapa()
         fisica = Fisica()
         novo_px = self.px + self.vx
@@ -226,6 +251,7 @@ class Minions:
           self.px = novo_px
           self.py = novo_py 
     def desenha(self,tela):
+      if self.vida_atual>0:
         self.vetor_direcao()
         if self.vy<0:
           n = 0
@@ -236,22 +262,26 @@ class Minions:
         elif self.vx>0:
           n = 3
         else:
-         n = -1
+          n = -1
         if self.frame>8:
           self.frame = 0
         if n>=0:
-          tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+          tela.blit(self.animacao[n][self.frame],(self.px,self.py))
         if self.vx == 0 and self.vy == 0:
             if self.vetory <0:
-              tela.blit(self.imagem[0][0],(self.px,self.py))
+              tela.blit(self.animacao[0][0],(self.px,self.py))
             elif self.vetorx < 0:
-              tela.blit(self.imagem[1][0],(self.px,self.py))
+              tela.blit(self.animacao[1][0],(self.px,self.py))
             elif self.vetory > 0:
-              tela.blit(self.imagem[2][0],(self.px,self.py))
+              tela.blit(self.animacao[2][0],(self.px,self.py))
             elif self.vetorx > 0:
-              tela.blit(self.imagem[3][0],(self.px,self.py))
+              tela.blit(self.animacao[3][0],(self.px,self.py))
             else:
-              tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+              tela.blit(self.animacao[n][self.frame],(self.px,self.py))
+      else:
+        if self.frame>5:
+          self.frame = 5
+        tela.blit(self.animacao_morte[self.frame],(self.px,self.py))
     def vetor_direcao(self):
       if not (self.vx == 0 and self.vy ==0):
         self.vetorx = self.vx
@@ -356,7 +386,8 @@ def main():
    tempo = [1,30]
    inicio_cronometro = time.time()
    inicio_minions = time.time()
-   inicio_animacao = time.time() 
+   inicio_animacao = time.time()
+   inicio_morte = 0   
    jogador2.vetorx *=-1
    while cena_principal:
     for event in pg.event.get():
@@ -439,7 +470,10 @@ def main():
           minion.movimento([[jogador1,jogador2],minions_teste])
           minion.desenha(tela) 
           minion.desenha_vida(tela)
-          if minion.vida_atual <= 0:
+          if minion.vida_atual <= 0 and minion.tempo_morte == 0:
+            minion.frame = 0 
+            minion.tempo_morte = time.time()
+          if minion.tempo_morte!=0 and agora - minion.tempo_morte > 2:
             minion.valor = False
       else:
         minions.remove(minion)
@@ -476,9 +510,18 @@ def main():
             tempo[0]-=1
         inicio_cronometro = time.time()
     
-    if(tempo[0] == 0 and tempo[1] == 0) or jogador1.vida_atual<=0 or jogador2.vida_atual<=0:
+    if(tempo[0] == 0 and tempo[1] == 0):
         cena_principal = False
         cena_final = True
+    if jogador1.vida_atual<=0 and inicio_morte == 0:
+        jogador1.frame = 0
+        inicio_morte = time.time()
+    if jogador2.vida_atual<=0 and inicio_morte == 0:
+        jogador2.frame = 0
+        inicio_morte = time.time()
+    if inicio_morte!=0 and (agora - inicio_morte) > 3:
+          cena_principal = False
+          cena_final = True
 
     #Atualizar a tela
     pg.display.flip()
