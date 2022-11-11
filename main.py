@@ -15,6 +15,23 @@ def load_image(name, colorkey=None, scale=1.0):
         image.set_colorkey(colorkey, pg.RLEACCEL)
     return image
 
+def lista_animacao(imagem):
+  lista = []
+  px = 14
+  py = 515
+  largura = 43
+  altura = 62
+  for i in range(4):
+    sublista=[]
+    for j in range(9):
+      subimagem = imagem.subsurface(pg.Rect(px,py,largura,altura))
+      sublista.append(subimagem)
+      px+=64
+    lista.append(sublista)
+    px = 14
+    py+=64
+  return lista
+
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
     TELA = pg.display.set_mode()  
@@ -54,9 +71,8 @@ class Poder:
     self.px = jogador.px
     self.py = jogador.py 
   def movimento(self):
-    if self.valor:
-      self.px += self.vx
-      self.py += self.vy
+    self.px += self.vx
+    self.py += self.vy
   def dano(self,corpo):
     if self.px+self.altura>=corpo.px and self.px<=corpo.px+corpo.largura and (self.py+self.largura>=corpo.py and self.py<=corpo.py+corpo.altura):
         corpo.vida -= 50
@@ -67,7 +83,7 @@ class Poder:
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
-    self.imagem = load_image(imagem, scale=1)
+    self.imagem = lista_animacao(load_image(imagem,scale=1))
     self.poder = poder
     self.vida = 100
 
@@ -75,13 +91,15 @@ class Jogador:
     def __init__ (self,px,py,personagem):
       self.px = px 
       self.py = py
+      self.frame = 0 
       self.personagem = personagem
       self.poder = personagem.poder
       self.vida = personagem.vida
       self.nome = personagem.nome
       self.imagem = personagem.imagem
-      self.largura = self.imagem.get_rect().width
-      self.altura = self.imagem.get_rect().height
+      self.imagem_principal = self.imagem[0][0]
+      self.largura = self.imagem_principal.get_rect().width
+      self.altura = self.imagem_principal.get_rect().height
       self.vetorx = Configuracoes.VELOCIDADE
       self.vetory = 0 
       self.vx = 0
@@ -124,7 +142,32 @@ class Jogador:
         self.px = novo_px
         self.py = novo_py
     def desenha(self,tela):
-      tela.blit(self.imagem,(self.px,self.py))
+      self.vetor_direcao()
+      if self.vy<0:
+        n = 0
+      elif self.vx<0:
+        n = 1
+      elif self.vy>0:
+        n = 2
+      elif self.vx>0:
+        n = 3
+      else:
+        n = -1
+      if self.frame>8:
+        self.frame = 0
+      if n>=0:
+        tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+      if self.vx == 0 and self.vy == 0:
+          if self.vetory <0:
+            tela.blit(self.imagem[0][0],(self.px,self.py))
+          elif self.vetorx < 0:
+            tela.blit(self.imagem[1][0],(self.px,self.py))
+          elif self.vetory > 0:
+            tela.blit(self.imagem[2][0],(self.px,self.py))
+          elif self.vetorx > 0:
+            tela.blit(self.imagem[3][0],(self.px,self.py))
+          else:
+            tela.blit(self.imagem[n][self.frame],(self.px,self.py))
     def vetor_direcao(self):
       if not (self.vx == 0 and self.vy ==0):
         self.vetorx = self.vx
@@ -133,13 +176,16 @@ class Jogador:
 class Minions:
     def __init__(self):
         self.valor = True
+        self.frame = 0
         self.px = Configuracoes.LARGURA_TELA//2
         self.py = Configuracoes.ALTURA_TELA//2
         self.vx = 0
-        self.vy = 0 
-        self.imagem = load_image('minion.png', scale=1)
-        self.largura = self.imagem.get_rect().width
-        self.altura = self.imagem.get_rect().height
+        self.vy = 0
+        self.vetorx = Configuracoes.VELOCIDADE
+        self.vetory = 0 
+        self.imagem = lista_animacao(load_image("minions.png",scale=1))
+        self.largura = self.imagem[0][0].get_rect().width
+        self.altura = self.imagem[0][0].get_rect().height
         self.vel = 0 
         self.vida_atual = 100
         self.vida_maxima = 100
@@ -180,7 +226,36 @@ class Minions:
           self.px = novo_px
           self.py = novo_py 
     def desenha(self,tela):
-        tela.blit(self.imagem, (self.px,self.py))
+        self.vetor_direcao()
+        if self.vy<0:
+          n = 0
+        elif self.vx<0:
+          n = 1
+        elif self.vy>0:
+          n = 2
+        elif self.vx>0:
+          n = 3
+        else:
+         n = -1
+        if self.frame>8:
+          self.frame = 0
+        if n>=0:
+          tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+        if self.vx == 0 and self.vy == 0:
+            if self.vetory <0:
+              tela.blit(self.imagem[0][0],(self.px,self.py))
+            elif self.vetorx < 0:
+              tela.blit(self.imagem[1][0],(self.px,self.py))
+            elif self.vetory > 0:
+              tela.blit(self.imagem[2][0],(self.px,self.py))
+            elif self.vetorx > 0:
+              tela.blit(self.imagem[3][0],(self.px,self.py))
+            else:
+              tela.blit(self.imagem[n][self.frame],(self.px,self.py))
+    def vetor_direcao(self):
+      if not (self.vx == 0 and self.vy ==0):
+        self.vetorx = self.vx
+        self.vetory = self.vy
 
 def main():
 
@@ -212,8 +287,8 @@ def main():
     personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     Raio = Poder("raio.png")
     Nuvem = Poder("nuvem.png")
-    Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
-    Marie = Personagem("Marie Curie","marie.png",Nuvem)
+    Nikola = Personagem("Nikola Tesla","./Imagens/Nikola/nikola.png",Raio) 
+    Marie = Personagem("Marie Curie","./Imagens/Marie/marie.png",Nuvem)
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
     Personagem1 = personagens.render(f'1) {Nikola.nome}', True, (0,0,0))
@@ -256,7 +331,6 @@ def main():
         escolha_jog2 = True
         time.sleep(0.2)
 
-
     #Escolha dos personagens
     if posicao == 0 and escolha_jog1 == False:
         Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))
@@ -280,8 +354,10 @@ def main():
    #Cena Principal
    #Análise de eventos
    tempo = [1,30]
-   comeco = time.time()
-   inicio = time.time()
+   inicio_cronometro = time.time()
+   inicio_minions = time.time()
+   inicio_animacao = time.time() 
+   jogador2.vetorx *=-1
    while cena_principal:
     for event in pg.event.get():
         #Evento de fechar a janela
@@ -346,10 +422,14 @@ def main():
     agora = time.time()
 
     #Minions
-    if agora - inicio > 3:
+
+    if len(minions) > 0 and Configuracoes.VELOCIDADE == 1:
+      Configuracoes.VELOCIDADE*=5
+
+    if agora - inicio_minions > 3 and len(minions) < 3:
       minion = Minions()
       minions.append(minion)
-      inicio = agora
+      inicio_minions = agora
     for minion in minions:
       if minion.valor:
           if fisica.contato(minion,jogador1.poder):
@@ -378,6 +458,13 @@ def main():
       jogador2.vida_atual = jogador2.vida_atual-1
     if fisica.contato(jogador1,jogador2.poder):
       jogador1.vida_atual = jogador1.vida_atual-1
+
+    if agora - inicio_animacao > 0.15: #Velocidade da animacao
+      jogador1.frame +=1 
+      jogador2.frame +=1
+      for minion in minions:
+        minion.frame +=1 
+      inicio_animacao = agora
         
     cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
@@ -385,12 +472,12 @@ def main():
     largura_cronometro = tamanho_cronometro[0]
     tela.blit(Cronometro, (Configuracoes.LARGURA_TELA /2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
     
-    if (agora-comeco>1):
+    if (agora-inicio_cronometro>1):
         tempo[1]-=1
         if tempo[1]<0:
             tempo[1]=59
             tempo[0]-=1
-        comeco = time.time()
+        inicio_cronometro = time.time()
     
     if(tempo[0] == 0 and tempo[1] == 0) or jogador1.vida_atual<=0 or jogador2.vida_atual<=0:
         cena_principal = False
