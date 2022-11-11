@@ -287,8 +287,8 @@ def main():
     personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     Raio = Poder("raio.png")
     Nuvem = Poder("nuvem.png")
-    Nikola = Personagem("Nikola Tesla","./Imagens/Nikola/nikola.png",Raio) 
-    Marie = Personagem("Marie Curie","./Imagens/Marie/marie.png",Nuvem)
+    Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
+    Marie = Personagem("Marie Curie","marie.png",Nuvem)
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
     Personagem1 = personagens.render(f'1) {Nikola.nome}', True, (0,0,0))
@@ -423,10 +423,7 @@ def main():
 
     #Minions
 
-    if len(minions) > 0 and Configuracoes.VELOCIDADE == 1:
-      Configuracoes.VELOCIDADE*=5
-
-    if agora - inicio_minions > 3 and len(minions) < 3:
+    if agora - inicio_minions > 3 and len(minions) < 5:
       minion = Minions()
       minions.append(minion)
       inicio_minions = agora
