@@ -318,13 +318,18 @@ def main():
     Raio = Poder("raio.png")
     Nuvem = Poder("nuvem.png")
     Cura = Poder("cura.png")
+    Gato = Poder("gato.png")
     Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
     Marie = Personagem("Marie Curie","marie.png",Nuvem)
     Darwin = Personagem("Charles Darwin", "darwin.png", Cura)
+    Erwin = Personagem("Erwin Schrodinger","erwin.png",Gato)
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     Escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
     Personagem1 = personagens.render(f'1) {Nikola.nome}', True, (0,0,0))
     Personagem2 = personagens.render(f'2) {Marie.nome}', True, (0,0,0))
+    Personagem3 = personagens.render(f'3) {Darwin.nome}', True, (0,0,0))
+    Personagem4 = personagens.render(f'4) {Erwin.nome}', True, (0,0,0))
+
     tela.fill((255, 255, 255))
     PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
     PY = 0.01 * Configuracoes.ALTURA_TELA
@@ -333,18 +338,23 @@ def main():
     px_personagens = 0.05*Configuracoes.LARGURA_TELA 
     py1 = (Configuracoes.ALTURA_TELA*0.3) + (Personagem1.get_size()[1] * 1.5)
     py2 = (Configuracoes.ALTURA_TELA*0.4) + (Personagem1.get_size()[1] * 1.5)
+    py3 = (Configuracoes.ALTURA_TELA*0.5) + (Personagem1.get_size()[1] * 1.5)
+    py4 = (Configuracoes.ALTURA_TELA*0.6) + (Personagem1.get_size()[1] * 1.5)
+
     tela.blit(Titulo, (PX,PY))
     tela.blit(Escolha, (px, py))
     tela.blit(Personagem1, (px_personagens, py1))
     tela.blit(Personagem2, (px_personagens, py2))
+    tela.blit(Personagem3, (px_personagens, py3))    
+    tela.blit(Personagem4, (px_personagens, py4))    
 
     if (event.type == pg.KEYDOWN and event.key == pg.K_DOWN):
-        if posicao>=0 and posicao<1:
+        if posicao>=0 and posicao<3:
             posicao+=1
         time.sleep(0.1)
         
     elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
-        if posicao>0 and posicao<=1:
+        if posicao>0 and posicao<=3:
             posicao-=1
         time.sleep(0.1)
 
@@ -353,29 +363,49 @@ def main():
           jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Nikola)
         if posicao == 1:
           jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Marie)
-        escolha_jog1 = True
+        if posicao == 2:
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Darwin)
+        if posicao == 3:
+          jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Erwin)
+        escolha_jog1 = True        
         time.sleep(0.2)
     elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
         if posicao == 0:
           jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Nikola)
         if posicao == 1:
           jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Marie)
-        escolha_jog2 = True
+        if posicao == 2:
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Darwin)
+        if posicao == 3:
+          jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,Erwin)
+        escolha_jog2 = True        
         time.sleep(0.2)
 
     #Escolha dos personagens
     if posicao == 0 and escolha_jog1 == False:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))
+        Personagem1 = personagens.render(f'1) {Nikola.nome}  [Jogador 1]', True, (122,122,0))
         tela.blit(Personagem1, (px_personagens, py1))
     elif posicao == 0 and escolha_jog1:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 2]', True, (122,122,0))
+        Personagem1 = personagens.render(f'1) {Nikola.nome}  [Jogador 2]', True, (122,122,0))
         tela.blit(Personagem1, (px_personagens, py1))
     if posicao == 1 and escolha_jog1 == False:
-        Personagem2 = personagens.render(f'2) Marie Curie [Jogador 1]', True, (122,122,0))
+        Personagem2 = personagens.render(f'2) {Marie.nome} [Jogador 1]', True, (122,122,0))
         tela.blit(Personagem2, (px_personagens, py2))
     elif posicao == 1 and escolha_jog1:
-        Personagem2 = personagens.render(f'2) Marie Curie [Jogador 2]', True, (122,122,0))
+        Personagem2 = personagens.render(f'2) {Marie.nome} [Jogador 2]', True, (122,122,0))
         tela.blit(Personagem2, (px_personagens, py2))
+    if posicao == 2 and escolha_jog1 == False:
+        Personagem3 = personagens.render(f'3) {Darwin.nome}  [Jogador 1]', True, (122,122,0))
+        tela.blit(Personagem3, (px_personagens, py3))
+    elif posicao == 2 and escolha_jog1:
+        Personagem3 = personagens.render(f'3) {Darwin.nome}  [Jogador 2]', True, (122,122,0))
+        tela.blit(Personagem3, (px_personagens, py3))       
+    if posicao == 3 and escolha_jog1 == False:
+        Personagem4 = personagens.render(f'4) {Erwin.nome}  [Jogador 1]', True, (122,122,0))
+        tela.blit(Personagem4, (px_personagens, py4))
+    elif posicao == 3 and escolha_jog1:
+        Personagem4 = personagens.render(f'4) {Erwin.nome}  [Jogador 2]', True, (122,122,0))
+        tela.blit(Personagem4, (px_personagens, py4))      
 
     if escolha_jog1 and escolha_jog2:
         cena_inicial = False
