@@ -107,28 +107,61 @@ class Mapa:
       pg.draw.rect(tela,(0, 255, 0),self.terra_plana,0)
 
 class Poder:
-  def __init__(self,imagem):
+  def __init__(self,imagem,tipo):
     self.imagem = load_image(imagem, scale=0.1)
+    self.tipo = tipo
     self.px,self.py = 0,0
     self.valor = False
+    self.tempo_de_uso = 0 
     self.vx = 0
     self.vy = 0
     self.largura,self.altura = self.imagem.get_rect().width,self.imagem.get_rect().height
-  def lancar(self,jogador):
-    if jogador.vida_atual>0:
+  def lancar(self,jogador,agora):
+    if jogador.vida_atual>0 and self.tempo_de_uso == 0:
       self.valor = True
+      self.tempo_de_uso = time.time() 
       jogador.vetor_direcao()
-      self.vx = jogador.vetorx
-      self.vy = jogador.vetory
-      self.px = jogador.px
-      self.py = jogador.py 
+      if self.tipo == "Projetil":
+        self.vx = jogador.vetorx
+        self.vy = jogador.vetory
+        self.px = jogador.px
+        self.py = jogador.py 
+      elif self.tipo == "Área":
+        self.px = jogador.px + 100*jogador.vetorx
+        self.py = jogador.py + 100*jogador.vetory
+      elif self.tipo == "Cura":
+        self.px = jogador.px - 70
+        self.py = jogador.py + jogador.largura - 100
+    elif self.tempo_de_uso !=0:
+      if self.tipo == "Projetil" and agora - self.tempo_de_uso > 2:
+        self.tempo_de_uso = 0
+      elif agora - self.tempo_de_uso > 7:
+        self.tempo_de_uso = 0
   def movimento(self):
-    self.px += self.vx
-    self.py += self.vy
-  def dano(self,corpo):
-    if self.px+self.altura>=corpo.px and self.px<=corpo.px+corpo.largura and (self.py+self.largura>=corpo.py and self.py<=corpo.py+corpo.altura):
-        corpo.vida -= 50
-        self.valor = False
+    if self.valor:
+      self.px += self.vx
+      self.py += self.vy
+  def efeito(self,corpos,jogador,agora):
+    if self.valor:
+      fisica = Fisica()
+      if self.tipo == "Projetil":
+        for corpo in corpos:
+          for ente in corpo:
+            if fisica.contato(ente,self):
+              ente.vida_atual -= 20
+              self.valor = False
+      elif self.tipo == "Área":
+        for corpo in corpos:
+          for ente in corpo:
+            if fisica.contato(ente,self):
+              ente.vida_atual -= 1
+        if agora - self.tempo_de_uso > 5:
+          self.valor = False 
+      elif self.tipo == "Cura":
+        if fisica.contato(jogador,self) and jogador.vida_atual < jogador.vida_maxima:
+         jogador.vida_atual+=0.1   
+        if agora - self.tempo_de_uso > 5:
+          self.valor = False 
   def desenha(self,tela):
     tela.blit(self.imagem, (self.px,self.py))
 
@@ -139,7 +172,6 @@ class Personagem:
     self.animacao_morte = animacao_morte(load_image(imagem,scale=1))
     self.animacao_ataque = animacao_ataque(load_image(imagem,scale=1))
     self.poder = poder
-    self.vida = 100
 
 class Jogador:  
     def __init__ (self,px,py,personagem):
@@ -151,7 +183,6 @@ class Jogador:
       self.atacado_valor = False 
       self.tempo_atacado = 0 
       self.poder = personagem.poder
-      self.vida = personagem.vida
       self.nome = personagem.nome
       self.animacao = personagem.animacao
       self.animacao_morte = personagem.animacao_morte
@@ -448,10 +479,10 @@ def main():
     titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
     escolha = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
-    Raio = Poder("raio.png")
-    Nuvem = Poder("nuvem.png")
-    Cura = Poder("cura.png")
-    Gato = Poder("gato.png")
+    Raio = Poder("raio.png","Projetil")
+    Nuvem = Poder("nuvem.png","Área")
+    Cura = Poder("cura.png","Cura")
+    Gato = Poder("gato.png","Projetil")
     Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
     Marie = Personagem("Marie Curie","marie.png",Nuvem)
     Darwin = Personagem("Charles Darwin", "darwin.png", Cura)
@@ -521,7 +552,9 @@ def main():
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
-            
+   
+    fisica = Fisica()
+    agora = time.time()
     #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
       jogador1.direita()
@@ -566,32 +599,27 @@ def main():
 
     #Poder
     if event.type == pg.KEYDOWN and event.key == pg.K_e or (pg.key.get_pressed()[pg.K_e]):
-      jogador1.poder.lancar(jogador1)
+      jogador1.poder.lancar(jogador1,agora)
     if event.type == pg.KEYDOWN and event.key == pg.K_q or (pg.key.get_pressed()[pg.K_q]):
       jogador1.ataque()
 
     if event.type == pg.KEYDOWN and event.key == pg.K_o or (pg.key.get_pressed()[pg.K_o]):
-      jogador2.poder.lancar(jogador2)
+      jogador2.poder.lancar(jogador2,agora)
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
       jogador2.ataque()
 
-    fisica = Fisica()
-    agora = time.time()
-
     jogador1.atacar([[jogador2],minions])
     jogador2.atacar([[jogador1],minions])
+    jogador1.poder.efeito([[jogador2],minions],jogador1,agora)
+    jogador2.poder.efeito([[jogador1],minions],jogador2,agora)
 
     #Minions
-    if agora - inicio_minions > 3 and len(minions) < 5:
+    if agora - inicio_minions > 3 and len(minions) < 3:
       minion = Minions([[jogador1,jogador2],minions])
       minions.append(minion)
       inicio_minions = agora
     for minion in minions:
       if minion.valor:
-          if fisica.contato(minion,jogador1.poder):
-            minion.vida_atual -= 1
-          if fisica.contato(minion, jogador2.poder):
-            minion.vida_atual -= 1
           minion.velocidade(jogador1,jogador2)
           minions_teste = minions[:]
           minions_teste.remove(minion)
@@ -616,11 +644,6 @@ def main():
     if jogador2.poder.valor:
       jogador2.poder.movimento()
       jogador2.poder.desenha(tela)
-
-    if fisica.contato(jogador2, jogador1.poder):
-      jogador2.vida_atual = jogador2.vida_atual-1
-    if fisica.contato(jogador1,jogador2.poder):
-      jogador1.vida_atual = jogador1.vida_atual-1
 
     if agora - inicio_animacao > 0.15: #Velocidade da animacao
       jogador1.frame +=1 
