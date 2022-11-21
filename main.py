@@ -64,16 +64,22 @@ def animacao_ataque(imagem):
 
 class Configuracoes:   
     #Definindo as Configuracoes do jogo
-    TELA = pg.display.set_mode()  
+    TELA = pg.display.set_mode((1280,768),pg.FULLSCREEN)  
     LARGURA_TELA,ALTURA_TELA = TELA.get_size()
     FONTE_TITULO = 96
     FONTE_MENOR = 48
     VELOCIDADE = 1
+    P1X,P1Y = (0.3*LARGURA_TELA,ALTURA_TELA//2 - 20)
+    P2X,P2Y = (0.7*LARGURA_TELA,ALTURA_TELA//2 - 20)
 
 class Imagens:
   MINIONS_ANIMACAO_MOVIMENTO = animacao_movimento(load_image("minions.png",scale=1))
   MINIONS_ANIMACAO_MORTE = animacao_morte(load_image("minions.png",scale=1))
   MINIONS_ANIMACAO_ATAQUE = animacao_ataque(load_image("minions.png",scale=1))
+  GRAMA = load_image("grama.png",scale=1)
+  AGUA = load_image("agua.png",scale=1)
+  TIJOLO = load_image("tijolo.png",scale=1)
+  MADEIRA = load_image("madeira.png",scale=1)
 
 class Fisica:
     def __init__(self):
@@ -82,7 +88,8 @@ class Fisica:
       return (corpo1.px+corpo1.largura>=corpo2.px and corpo1.px<=corpo2.px+corpo2.largura) and (corpo1.py+corpo1.altura>=corpo2.py and corpo1.py<=corpo2.py+corpo2.altura)
     def distancia(self,corpo1,corpo2):
       return (((((corpo1.px+corpo1.largura)//2)-((corpo2.px+corpo2.largura)//2))**2 + ((((corpo1.py+corpo1.altura)//2))-((corpo2.py+corpo2.altura)//2))**2)**0.5)
-    def movimento(self,novo_corpo,corpos,mapa):
+    def movimento(self,novo_corpo,corpos):
+      mapa = Mapa()
       for corpo in corpos:
           for ente in corpo:
             if self.contato(novo_corpo,ente):
@@ -99,12 +106,80 @@ class Fisica:
 
 class Mapa:
     def __init__(self):
-      self.terra_plana = (0.05*Configuracoes.LARGURA_TELA, 0.1*Configuracoes.ALTURA_TELA, 0.9*Configuracoes.LARGURA_TELA, 0.8*Configuracoes.ALTURA_TELA)
+      self.terra_plana = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,0,0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,0,0,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,0,0,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,0,0,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,0,0,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,0,0,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,0,0,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,0,0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
     def limite(self,corpo):
-      return (corpo.px <= 0.05*Configuracoes.LARGURA_TELA or corpo.px + corpo.largura >= 0.95*Configuracoes.LARGURA_TELA or corpo.py <= 0.1*Configuracoes.ALTURA_TELA or corpo.py + corpo.altura >= 0.9*Configuracoes.ALTURA_TELA)
+      if corpo.px+corpo.largura>Configuracoes.LARGURA_TELA or corpo.py+corpo.altura> Configuracoes.ALTURA_TELA or corpo.px < 0 or corpo.py <0:
+        return True
+      x = int(corpo.px//32)
+      y = int(corpo.py//32) 
+      x2 = int((corpo.px + corpo.largura)//32)
+      y2 = int((corpo.py + corpo.altura)//32)
+      if self.terra_plana[y][x] == 2 or self.terra_plana[y][x2] == 2 or self.terra_plana[y2][x] == 2 or self.terra_plana[y2][x2] == 2:
+        return True
+      else: 
+        return False
+    def dano(self,corpo):
+      x = int(corpo.px//32)
+      y = int(corpo.py//32) 
+      x2 = int((corpo.px + corpo.largura)//32)
+      y2 = int((corpo.py + corpo.altura)//32)
+      if self.terra_plana[y][x] == 0 or self.terra_plana[y][x2] == 0 or self.terra_plana[y2][x] == 0 or self.terra_plana[y2][x2] == 0:
+        corpo.vida_atual -= 0.1
+    def quebrar(self,corpo):
+      x = int(corpo.px//32)
+      y = int(corpo.py//32) 
+      x2 = int((corpo.px + corpo.largura)//32)
+      y2 = int((corpo.py + corpo.altura)//32)
+      if self.terra_plana[y][x] == 3 and x in [18,21]:
+        self.terra_plana[y][x] = 1
+      elif x in [19,20]:
+        self.terra_plana[y][x] = 0
+      if self.terra_plana[y][x2] == 3 and x2 in [18,21]:
+        self.terra_plana[y][x2] = 1
+      elif x2 in [19,20]:
+        self.terra_plana[y][x2] = 0
+      if self.terra_plana[y2][x] == 3 and x in [18,21]:
+        self.terra_plana[y2][x] = 1
+      elif x in [19,20]:
+        self.terra_plana[y2][x] = 0
+      if self.terra_plana[y2][x2] == 3 and x2 in [18,21]:
+        self.terra_plana[y2][x2] = 1
+      elif x2 in [19,20]:
+        self.terra_plana[y2][x2] = 0
     def desenha(self,tela):
-      tela.fill((0, 0, 255))
-      pg.draw.rect(tela,(0, 255, 0),self.terra_plana,0)
+      for i in range(len(self.terra_plana)):
+        for j in range(len(self.terra_plana[i])):
+          if self.terra_plana[i][j] == 0:
+           tela.blit(Imagens.AGUA, (32*j,32*i))
+          elif self.terra_plana[i][j] == 1:
+            tela.blit(Imagens.GRAMA, (32*j,32*i))
+          elif self.terra_plana[i][j] == 2:
+            tela.blit(Imagens.TIJOLO, (32*j,32*i))
+          elif self.terra_plana[i][j] == 3:
+            tela.blit(Imagens.MADEIRA, (32*j,32*i))
 
 class Poder:
   def __init__(self,imagem,tipo):
@@ -148,7 +223,7 @@ class Poder:
         for corpo in corpos:
           for ente in corpo:
             if fisica.contato(ente,self):
-              ente.vida_atual -= 20
+              ente.vida_atual -= 40
               self.valor = False
       elif self.tipo == "Área":
         for corpo in corpos:
@@ -217,11 +292,11 @@ class Jogador:
       if self.vida_atual>0:
         self.frame = 0
         self.ataque_valor = True
-    def atacar(self,corpos):
+    def atacar(self,corpos,mapa):
       if self.vida_atual> 0 and self.ataque_valor and self.frame == 5:
         fisica = Fisica()
-        mapa = Mapa()
         jogador_teste = Jogador(self.px+self.vetorx,self.py+self.vetory,self.personagem)
+        mapa.quebrar(jogador_teste)
         for corpo in corpos:
             for ente in corpo:
               if fisica.contato(jogador_teste,ente):
@@ -236,7 +311,7 @@ class Jogador:
                   for x_teste in corpos_teste:
                     if ente in x_teste:
                       x_teste.remove(ente)
-                  if fisica.movimento(novo_ente,corpos_teste,mapa):
+                  if fisica.movimento(novo_ente,corpos_teste):
                     ente.px = novo_ente.px
                     ente.py = novo_ente.py
                   ente.atacado_valor = True 
@@ -250,12 +325,11 @@ class Jogador:
         self.tempo_atacado = 0 
     def movimento(self,corpos):
       if self.vida_atual>0:
-        mapa = Mapa()
         fisica = Fisica()
         novo_px = self.px + self.vx
         novo_py = self.py + self.vy
         jogador_teste = Jogador(novo_px,novo_py,self.personagem)
-        if not self.atacado_valor and fisica.movimento(jogador_teste,corpos,mapa):
+        if not self.atacado_valor and fisica.movimento(jogador_teste,corpos):
           self.px = novo_px
           self.py = novo_py
     def desenha(self,tela):
@@ -311,7 +385,6 @@ class Jogador:
 class Minions:
     def __init__(self,corpos):
         fisica = Fisica()
-        mapa = Mapa()
         self.valor = True
         self.frame = 0
         self.vx = 0
@@ -334,9 +407,9 @@ class Minions:
         self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
         self.px = Configuracoes.LARGURA_TELA//2
         self.py = Configuracoes.ALTURA_TELA//2
-        while not fisica.movimento(self,corpos,mapa):
-          self.px = random.randrange(0,Configuracoes.LARGURA_TELA)
-          self.py = random.randrange(0,Configuracoes.ALTURA_TELA)
+        while not fisica.movimento(self,corpos):
+          self.px = random.randrange(0,Configuracoes.LARGURA_TELA-self.largura)
+          self.py = random.randrange(0,Configuracoes.ALTURA_TELA-self.altura)
     def desenha_vida(self,tela):
         pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
         pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)    
@@ -356,20 +429,20 @@ class Minions:
       if self.vida_atual>0:
         self.frame = 0
         self.ataque_valor = True    
-    def atacar(self,corpos):
+    def atacar(self,corpos,mapa):
       if self.vida_atual> 0 and self.ataque_valor and self.frame == 5:
         fisica = Fisica()
-        mapa = Mapa()
         minion_teste = Minions(corpos)
         minion_teste.px = self.px + self.vetorx
         minion_teste.py = self.py + self.vetory
+        mapa.quebrar(minion_teste)
         for corpo in corpos:
             for ente in corpo:
               if fisica.contato(minion_teste,ente):
                   ente.vida_atual-=10
                   novo_ente = Minions(corpos)
-                  novo_ente.px = ente.px + 20*self.vetorx
-                  novo_ente.py = ente.py + 20*self.vetory
+                  novo_ente.px = ente.px + 50*self.vetorx
+                  novo_ente.py = ente.py + 50*self.vetory
                   corpos_teste = []
                   for x in corpos:
                     x_teste = x[:]
@@ -377,7 +450,7 @@ class Minions:
                   for x_teste in corpos_teste:
                     if ente in x_teste:
                       x_teste.remove(ente)
-                  if fisica.movimento(novo_ente,corpos_teste,mapa):
+                  if fisica.movimento(novo_ente,corpos_teste):
                     ente.px = novo_ente.px
                     ente.py = novo_ente.py
                   ente.atacado_valor = True 
@@ -391,14 +464,13 @@ class Minions:
         self.tempo_atacado = 0 
     def movimento(self,corpos):
       if self.vida_atual>0:
-        mapa = Mapa()
         fisica = Fisica()
         novo_px = self.px + self.vx
         novo_py = self.py + self.vy
         minion_teste = Minions(corpos)
         minion_teste.px = novo_px
         minion_teste.py = novo_py
-        if not self.atacado_valor and fisica.movimento(minion_teste,corpos,mapa):
+        if not self.atacado_valor and fisica.movimento(minion_teste,corpos):
           self.px = novo_px
           self.py = novo_py
     def desenha(self,tela):
@@ -464,7 +536,7 @@ def main():
    minions = []
    
    #Criando a tela 
-   tela = pg.display.set_mode((0,0),pg.FULLSCREEN)
+   tela = Configuracoes.TELA
 
    #Cena Inicial
    escolha_jog1 = False
@@ -517,10 +589,10 @@ def main():
             posicao-=1
 
     if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        jogador1 = Jogador(0.1*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,lista_personagens[posicao])
+        jogador1 = Jogador(Configuracoes.P1X,Configuracoes.P1Y,lista_personagens[posicao])
         escolha_jog1 = True        
     elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        jogador2 = Jogador(0.9*Configuracoes.LARGURA_TELA,Configuracoes.ALTURA_TELA//2,lista_personagens[posicao])
+        jogador2 = Jogador(Configuracoes.P2X,Configuracoes.P2Y,lista_personagens[posicao])
         escolha_jog2 = True        
 
     #Escolha dos personagens
@@ -546,6 +618,7 @@ def main():
    inicio_animacao = time.time()
    inicio_morte = 0   
    jogador2.vetorx *=-1
+   mapa = Mapa()
    while cena_principal:
     for event in pg.event.get():
         #Evento de fechar a janela
@@ -589,8 +662,9 @@ def main():
     jogador2.movimento([[jogador1],minions])
     
     #Desenhar a tela
-    mapa = Mapa()
     mapa.desenha(tela)
+    mapa.dano(jogador1)
+    mapa.dano(jogador2)
     #Pegar uma imagem
     jogador1.desenha(tela)
     jogador2.desenha(tela)
@@ -608,8 +682,8 @@ def main():
     if event.type == pg.KEYDOWN and event.key == pg.K_u or (pg.key.get_pressed()[pg.K_u]):
       jogador2.ataque()
 
-    jogador1.atacar([[jogador2],minions])
-    jogador2.atacar([[jogador1],minions])
+    jogador1.atacar([[jogador2],minions],mapa)
+    jogador2.atacar([[jogador1],minions],mapa)
     jogador1.poder.efeito([[jogador2],minions],jogador1,agora)
     jogador2.poder.efeito([[jogador1],minions],jogador2,agora)
 
@@ -625,9 +699,10 @@ def main():
           minions_teste.remove(minion)
           if (fisica.distancia(minion,jogador1) <50 or fisica.distancia(minion,jogador2)<50) and not minion.ataque_valor:
             minion.ataque()
-          minion.atacar([[jogador1,jogador2]])
+          minion.atacar([[jogador1,jogador2]],mapa)
           minion.atacado(agora)
           minion.movimento([[jogador1,jogador2],minions_teste])
+          mapa.dano(minion)
           minion.desenha(tela) 
           minion.desenha_vida(tela)
           if minion.vida_atual <= 0 and minion.tempo_morte == 0:
@@ -694,6 +769,8 @@ def main():
         Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
         if jogador1.vida_atual>0 and jogador2.vida_atual>0:
           Subtitulo = subtitulo.render(f'Empate Técnico',True,(0,0,0))
+        elif jogador1.vida_atual <= 0 and jogador2.vida_atual <= 0:
+          Subtitulo = subtitulo.render(f'Vitória dos Minions',True,(0,0,0))
         elif jogador2.vida_atual<=0:
           Subtitulo = subtitulo.render(f'O Melhor Cientista da Historia: {jogador1.nome} [Jogador 1]', True, (0,0,0))
         else:
