@@ -81,6 +81,53 @@ class Imagens:
   TIJOLO = load_image("tijolo.png",scale=1)
   MADEIRA = load_image("madeira.png",scale=1)
 
+class Cronometro:
+    def __init__(self,inicio):
+       self.inicio = inicio
+    def atualiza(self,tempo,agora):
+      if (agora-self.inicio>1):
+        tempo[1]-=1
+        if tempo[1]<0:
+            tempo[1]=59
+            tempo[0]-=1
+        self.inicio = time.time()
+    def desenha(self,tempo,tela):
+       cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
+       Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
+       tamanho_cronometro = Cronometro.get_size()
+       largura_cronometro = tamanho_cronometro[0]
+       tela.blit(Cronometro, (Configuracoes.LARGURA_TELA /2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
+
+class Estado_Jogo:
+  def __init__(self,inicio):
+    self.inicio_animacao = inicio
+    self.inicio_minions = inicio
+    self.inicio_morte = 0 
+  def encerra(self,agora,tempo,jogador1,jogador2):
+    if jogador1.vida_atual<=0 and self.inicio_morte == 0:
+        jogador1.frame = 0
+        self.inicio_morte = time.time()
+    if jogador2.vida_atual<=0 and self.inicio_morte == 0:
+        jogador2.frame = 0
+        self.inicio_morte = time.time()
+    if(tempo[0] == 0 and tempo[1] == 0):
+        return False
+    elif self.inicio_morte!=0 and (agora - self.inicio_morte) > 3:
+      return False
+    else:
+      return True 
+  def gera_minions(self,agora,corpos):
+    if agora - self.inicio_minions > 3 and len(corpos[1]) < 3:
+      minion = Minions(corpos)
+      corpos[1].append(minion)
+      self.inicio_minions = agora
+  def animacao(self,agora,corpos):
+    if agora - self.inicio_animacao > 0.15: #Velocidade da animacao
+      for corpo in corpos:
+        for ente in corpo:
+          ente.frame+=1
+      self.inicio_animacao = agora
+
 class Fisica:
     def __init__(self):
       pass
@@ -243,6 +290,8 @@ class Poder:
 class Personagem:
    def __init__(self, nome, imagem, poder):
     self.nome = nome
+    self.velocidade = Configuracoes.VELOCIDADE
+    self.vida_maxima = 200
     self.animacao = animacao_movimento(load_image(imagem,scale=1))
     self.animacao_morte = animacao_morte(load_image(imagem,scale=1))
     self.animacao_ataque = animacao_ataque(load_image(imagem,scale=1))
@@ -265,27 +314,28 @@ class Jogador:
       self.imagem_principal = self.animacao[0][0]
       self.largura = self.imagem_principal.get_rect().width
       self.altura = self.imagem_principal.get_rect().height
-      self.vetorx = Configuracoes.VELOCIDADE
+      self.velocidade = personagem.velocidade
+      self.vetorx = self.velocidade
       self.vetory = 0 
       self.vx = 0
       self.vy = 0
-      self.vida_atual = 200
-      self.vida_maxima = 200
+      self.vida_maxima = personagem.vida_maxima
+      self.vida_atual = self.vida_maxima
       self.comprimento_barra_vida = 50
       self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
     def desenha_vida(self,tela):
         pg.draw.rect(tela, (255,0,0), (self.px,self.py-20,self.vida_atual/self.razao_vida,10))
         pg.draw.rect(tela, (255,255,255),(self.px,self.py-20,self.comprimento_barra_vida,10),2)
     def cima(self):
-      self.vy = - Configuracoes.VELOCIDADE 
+      self.vy = - self.velocidade
     def baixo(self):
-      self.vy = Configuracoes.VELOCIDADE
+      self.vy = self.velocidade
     def esquerda(self):
-      self.vx = - Configuracoes.VELOCIDADE
+      self.vx = - self.velocidade
     def direita(self):
-      self.vx = Configuracoes.VELOCIDADE
+      self.vx = self.velocidade
     def diagonal(self):
-      modulo = (((self.vx)**2+(self.vy)**2)**0.5)/Configuracoes.VELOCIDADE
+      modulo = (((self.vx)**2+(self.vy)**2)**0.5)/self.velocidade
       self.vx /= modulo  
       self.vy /= modulo
     def ataque(self):
@@ -523,28 +573,59 @@ class Minions:
         self.vetorx = self.vx
         self.vetory = self.vy
 
-def main():
+class Cena_final:
+  def __init__(self,jogador1,jogador2,tela):
+    self.jogador1 = jogador1
+    self.jogador2 = jogador2
+    self.tela = tela
+    self.encerrada = False
+    self.titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
+    self.subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
+    self.Titulo = self.titulo.render(f'Guerra de Cientistas',True,(0,0,0))
+    if self.jogador1.vida_atual>0 and self.jogador2.vida_atual>0:
+      self.Subtitulo = self.subtitulo.render(f'Empate Técnico',True,(0,0,0))
+    elif self.jogador1.vida_atual <= 0 and self.jogador2.vida_atual <= 0:
+      self.Subtitulo = self.subtitulo.render(f'Vitória dos Minions',True,(0,0,0))
+    elif self.jogador2.vida_atual<=0:
+      self.Subtitulo = self.subtitulo.render(f'O Melhor Cientista da Historia: {self.jogador1.nome} [Jogador 1]', True, (0,0,0))
+    else:
+      self.Subtitulo = self.subtitulo.render(f'O Melhor Cientista da Historia: {self.jogador2.nome} [Jogador 2]', True, (0,0,0))
+    self.tela.fill((255, 255, 255))
+    self.PX = Configuracoes.LARGURA_TELA // 2 - self.Titulo.get_size()[0] // 2
+    self.PY = Configuracoes.ALTURA_TELA //2 - self.Titulo.get_size()[1]
+    self.px = Configuracoes.LARGURA_TELA // 2 - self.Subtitulo.get_size()[0] // 2
+    self.py = (self.PY) + (self.Subtitulo.get_size()[1] * 3)
+  def rodar(self):
+    while not self.encerrada:
+      self.tratamento_de_eventos()
+      self.atualiza_estado()
+      self.desenha()
+  def tratamento_de_eventos(self):
+    for event in pg.event.get():
+        if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
+            print("Encerrando o programa.")
+            sys.exit()
+  def atualiza_estado(self):
+    pass
+  def desenha(self):
+        self.tela.fill((255, 255, 255))
+        self.tela.blit(self.Titulo, (self.PX,self.PY))
+        self.tela.blit(self.Subtitulo, (self.px, self.py))
+        pg.display.flip()
 
+def main():
    #Inicializando o pygame
    pg.init()
-    
    cena_inicial = True
    cena_principal = False
    cena_final = False
-    
-   #Dados dos minions
-   minions = []
-   
-   #Criando a tela 
+   minions = [] 
    tela = Configuracoes.TELA
-
-   #Cena Inicial
    escolha_jog1 = False
    escolha_jog2 = False 
    posicao = 0 
    while cena_inicial:
     for event in pg.event.get():
-        #Evento de fechar a janela
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
@@ -558,6 +639,8 @@ def main():
     Nikola = Personagem("Nikola Tesla","nikola.png",Raio) 
     Marie = Personagem("Marie Curie","marie.png",Nuvem)
     Darwin = Personagem("Charles Darwin", "darwin.png", Cura)
+    Darwin.vida_maxima = 400 #Vantagem
+    Darwin.velocidade *= 0.5 #Desvantagem
     Erwin = Personagem("Erwin Schrodinger","erwin.png",Gato)
     lista_personagens = [Nikola,Marie,Darwin,Erwin]
     Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
@@ -611,24 +694,19 @@ def main():
     pg.display.flip() 
    
    #Cena Principal
-   #Análise de eventos
    tempo = [1,30]
-   inicio_cronometro = time.time()
-   inicio_minions = time.time()
-   inicio_animacao = time.time()
-   inicio_morte = 0   
    jogador2.vetorx *=-1
    mapa = Mapa()
+   cronometro = Cronometro(time.time())
+   estado_jogo = Estado_Jogo(time.time())
    while cena_principal:
     for event in pg.event.get():
-        #Evento de fechar a janela
         if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
             print("Encerrando o programa.")
             sys.exit()
    
     fisica = Fisica()
     agora = time.time()
-    #Mudar a velocidade dos jogadores
     if (event.type == pg.KEYDOWN and event.key == pg.K_d) or (pg.key.get_pressed()[pg.K_d]):
       jogador1.direita()
     elif (event.type == pg.KEYDOWN and event.key == pg.K_a) or (pg.key.get_pressed()[pg.K_a]):
@@ -684,14 +762,13 @@ def main():
 
     jogador1.atacar([[jogador2],minions],mapa)
     jogador2.atacar([[jogador1],minions],mapa)
+    jogador1.atacado(agora)
+    jogador2.atacado(agora)
     jogador1.poder.efeito([[jogador2],minions],jogador1,agora)
     jogador2.poder.efeito([[jogador1],minions],jogador2,agora)
 
     #Minions
-    if agora - inicio_minions > 3 and len(minions) < 3:
-      minion = Minions([[jogador1,jogador2],minions])
-      minions.append(minion)
-      inicio_minions = agora
+    estado_jogo.gera_minions(agora,[[jogador1,jogador2],minions])
     for minion in minions:
       if minion.valor:
           minion.velocidade(jogador1,jogador2)
@@ -720,69 +797,17 @@ def main():
       jogador2.poder.movimento()
       jogador2.poder.desenha(tela)
 
-    if agora - inicio_animacao > 0.15: #Velocidade da animacao
-      jogador1.frame +=1 
-      jogador2.frame +=1
-      for minion in minions:
-        minion.frame +=1 
-      inicio_animacao = agora
-        
-    cronometro = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
-    Cronometro = cronometro.render(f'{tempo[0]}:{tempo[1]:02d}',True,(0,0,0))
-    tamanho_cronometro = Cronometro.get_size()
-    largura_cronometro = tamanho_cronometro[0]
-    tela.blit(Cronometro, (Configuracoes.LARGURA_TELA /2 - largura_cronometro//2,0.1*Configuracoes.ALTURA_TELA))
-    
-    if (agora-inicio_cronometro>1):
-        tempo[1]-=1
-        if tempo[1]<0:
-            tempo[1]=59
-            tempo[0]-=1
-        inicio_cronometro = time.time()
-    
-    jogador1.atacado(agora)
-    jogador2.atacado(agora)
+    estado_jogo.animacao(agora,[[jogador1,jogador2],minions])
+    cronometro.atualiza(tempo,agora)
+    cronometro.desenha(tempo,tela)
+    cena_principal = estado_jogo.encerra(agora,tempo,jogador1,jogador2)
+    cena_final = not cena_principal
 
-    if(tempo[0] == 0 and tempo[1] == 0):
-        cena_principal = False
-        cena_final = True
-    if jogador1.vida_atual<=0 and inicio_morte == 0:
-        jogador1.frame = 0
-        inicio_morte = time.time()
-    if jogador2.vida_atual<=0 and inicio_morte == 0:
-        jogador2.frame = 0
-        inicio_morte = time.time()
-    if inicio_morte!=0 and (agora - inicio_morte) > 3:
-          cena_principal = False
-          cena_final = True
-
-    #Atualizar a tela
     pg.display.flip()
-    #Cena Final 
-    while cena_final:
-        for event in pg.event.get():
-        #Evento de fechar a janela
-           if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
-            sys.exit()
-        titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
-        subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
-        Titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
-        if jogador1.vida_atual>0 and jogador2.vida_atual>0:
-          Subtitulo = subtitulo.render(f'Empate Técnico',True,(0,0,0))
-        elif jogador1.vida_atual <= 0 and jogador2.vida_atual <= 0:
-          Subtitulo = subtitulo.render(f'Vitória dos Minions',True,(0,0,0))
-        elif jogador2.vida_atual<=0:
-          Subtitulo = subtitulo.render(f'O Melhor Cientista da Historia: {jogador1.nome} [Jogador 1]', True, (0,0,0))
-        else:
-          Subtitulo = subtitulo.render(f'O Melhor Cientista da Historia: {jogador2.nome} [Jogador 2]', True, (0,0,0))
-        tela.fill((255, 255, 255))
-        PX = Configuracoes.LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
-        PY = Configuracoes.ALTURA_TELA //2 - Titulo.get_size()[1]
-        px = Configuracoes.LARGURA_TELA // 2 - Subtitulo.get_size()[0] // 2
-        py = (PY) + (Subtitulo.get_size()[1] * 3)
-        tela.blit(Titulo, (PX,PY))
-        tela.blit(Subtitulo, (px, py))
-        pg.display.flip()
+    
+    if cena_final:
+      final = Cena_final(jogador1,jogador2,tela)
+      final.rodar()
 
 if __name__ == "__main__":
    main() 
