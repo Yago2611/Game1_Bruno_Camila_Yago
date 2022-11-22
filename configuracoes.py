@@ -8,7 +8,3 @@ class Configuracoes:
   VELOCIDADE = 1
   P1X,P1Y = (0.3*LARGURA_TELA,ALTURA_TELA//2 - 20)
   P2X,P2Y = (0.7*LARGURA_TELA,ALTURA_TELA//2 - 20)
-  
-
-
-  
