@@ -1,2 +1,0 @@
-class Poderes:
-  pass
