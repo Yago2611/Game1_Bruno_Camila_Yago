@@ -3,10 +3,10 @@ import sys
 from configuracoes import Configuracoes
 
 class Cena_final:
-  def __init__(self,jogador1,jogador2,tela):
-    self.jogador1 = jogador1
-    self.jogador2 = jogador2
-    self.tela = tela
+  def __init__(self,cena_principal):
+    self.jogador1 = cena_principal.jogador1
+    self.jogador2 = cena_principal.jogador2
+    self.tela = cena_principal.tela
     self.encerrada = False
     self.titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
     self.subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
