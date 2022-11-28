@@ -1,87 +1,74 @@
 import pygame as pg
-import sys 
-import jogador
-import configuracoes
-import Personagens
+import sys
+from configuracoes import Configuracoes
+from personagens_criados import Personagens_criados
+from copy import copy
+from jogador import Jogador 
 
-class Cena_Inicial:
-  def __init__(self,tela):
-    self.tela = tela
-    #Variaveis booleanas
-    self.encerrar = False
-    self.escolha_jog1 = False
-    self.escolha_jog2 = False         
-    #Criando os personagens
-    self.personagem_1 = Personagens("Nikola Tesla",Raio,"Nikola.png",Configuracoes.VIDA)
-    self.personagem_2 = Personagens("Marie Curie",Veneno,"Marie.png",Configuracoes.VIDA)
-    #Criando os textos
-    fonte_titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
-    fonte_subtitulo = pg.font.SysFont(None,Configuracoes.FONTE_MAIOR)
-    fonte_nomes = pg.font.SysFont(None,Configuracoes.FONTE_MENOR)
-    self.titulo = titulo.render(f'Guerra de Cientistas',True,(0,0,0))
-    self.escolha = escolha.render(f'Escolha um personagem:', True, (0,0,0))
-    self.personagem1 = personagens.render(f'1) {self.personagem_1.nome}', True, (0,0,0))
-    self.personagem2 = personagens.render(f'2) {self.personagem_2.nome}', True, (0,0,0))
-    tela.fill((255, 255, 255))
-    PX = LARGURA_TELA // 2 - Titulo.get_size()[0] // 2
-    PY = 0.01 * ALTURA_TELA
-    px = LARGURA_TELA // 2 - Escolha.get_size()[0] // 2
-    py = (0.2 * ALTURA_TELA // 2) + (Escolha.get_size()[1] * 1.5)
-    px_personagens = 0.05*LARGURA_TELA 
-    py1 = (ALTURA_TELA*0.3) + (Personagem1.get_size()[1] * 1.5)
-    py2 = (ALTURA_TELA*0.4) + (Personagem1.get_size()[1] * 1.5)
- 
-def rodar(self):
-  while not self.encerrar:
-    self.tratamento_de_eventos()
-    self.atualiza_estado()
-    self.desenha()
-
-def tratamento_de_eventos(self):
-  for event in pg.event.get():
-     #Evento de fechar a janela
-     if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
-          sys.exit()
+class Cena_inicial:
+  def __init__(self):
+    self.tela = Configuracoes.TELA
+    self.escolha_jogador1 = False
+    self.escolha_jogador2 = False 
+    self.posicao = 0 
+    self.jogador1 = 0
+    self.jogador2 = 0 
+    self.titulo = pg.font.SysFont(None,Configuracoes.FONTE_TITULO)
+    self.escolha = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
+    self.personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
+    self.Titulo = self.titulo.render(f'Guerra de Cientistas',True,(0,0,0))
+    self.Escolha = self.escolha.render(f'Escolha um personagem:', True, (0,0,0))
+    self.lista_personagens = Personagens_criados.lista 
+    self.lista_escolha = []
+    self.encerrada = False
+    for i in range(len(self.lista_personagens)):
+      personagemi = self.personagens.render(f'{i+1}) {self.lista_personagens[i].nome}',True,(0,0,0))
+      self.lista_escolha.append(personagemi)
+    self.PX = Configuracoes.LARGURA_TELA // 2 - self.Titulo.get_size()[0] // 2
+    self.PY = 0.01 * Configuracoes.ALTURA_TELA
+    self.px = Configuracoes.LARGURA_TELA // 2 - self.Escolha.get_size()[0] // 2
+    self.py = (0.2 * Configuracoes.ALTURA_TELA // 2) + (self.Escolha.get_size()[1] * 1.5)
+    self.px_personagens = 0.05*Configuracoes.LARGURA_TELA 
+    self.py_personagens = []
+    for i in range(len(self.lista_escolha)):
+      pyi = Configuracoes.ALTURA_TELA*(0.3 + 0.1*i) +  (self.lista_escolha[0].get_size()[1]*1.5)
+      self.py_personagens.append(pyi)
+  def rodar(self):
+    while not self.encerrada:
+      self.tratamento_de_eventos()
+      self.atualiza_estado()
+      self.desenha()
+  def tratamento_de_eventos(self):
+    for event in pg.event.get():
+        if event.type == (pg.QUIT) or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE) or (pg.key.get_pressed()[pg.K_ESCAPE]): 
+            print("Encerrando o programa.")
+            sys.exit()
         if (event.type == pg.KEYDOWN and event.key == pg.K_DOWN):
-          if posicao>=0 and posicao<Configuracoes.NUM_PERSONAGENS-1:
-            posicao+=1
-            time.sleep(0.1)
+         if self.posicao>=0 and self.posicao<3:
+            self.posicao+=1
         elif (event.type == pg.KEYDOWN and event.key == pg.K_UP):
-          if posicao>0 and posicao<=Configuracoes.NUM_PERSONAGENS:
-            posicao-=1
-            time.sleep(0.1)
-
-    if escolha_jog1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        escolha_jog1 = True
-        time.sleep(0.2)
-    elif escolha_jog1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-        escolha_jog2 = True
-        time.sleep(0.2)
-
-def atualiza_estado(self):
-  if posicao == 0 and escolha_jog1 == False:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 1]', True, (122,122,0))
-        tela.blit(Personagem1, (px_personagens, py1))
-    elif posicao == 0 and escolha_jog1:
-        Personagem1 = personagens.render(f'1) Nikola Tesla  [Jogador 2]', True, (122,122,0))
-        tela.blit(Personagem1, (px_personagens, py1))
-    if posicao == 1 and escolha_jog1 == False:
-        Personagem2 = personagens.render(f'2) Marie Curie [Jogador 1]', True, (122,122,0))
-        tela.blit(Personagem2, (px_personagens, py2))
-    elif posicao == 1 and escolha_jog1:
-        Personagem2 = personagens.render(f'2) Marie Curie [Jogador 2]', True, (122,122,0))
-        tela.blit(Personagem2, (px_personagens, py2))
-  if self.escolha_jog1 and self.escolha_jog2:
-    self.encerrar = True 
-    
-def desenha(self):
-  tela.fill((255, 255, 255))
-  tela.blit(Titulo, (PX,PY))
-    tela.blit(Escolha, (px, py))
-    tela.blit(Personagem1, (px_personagens, py1))
-    tela.blit(Personagem2, (px_personagens, py2))
-  pg.display.flip() 
-
-  
-    
-   
+          if self.posicao>0 and self.posicao<=3:
+            self.posicao-=1
+        if self.escolha_jogador1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+            self.jogador1 = Jogador(Configuracoes.P1X,Configuracoes.P1Y,(self.lista_personagens)[self.posicao])
+            self.escolha_jogador1 = True        
+        elif self.escolha_jogador1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+            self.jogador2 = Jogador(Configuracoes.P2X,Configuracoes.P2Y,(self.lista_personagens)[self.posicao])
+            self.escolha_jogador2 = True        
+  def atualiza_estado(self):
+      if self.escolha_jogador1 and self.escolha_jogador2:
+        self.encerrada = True
+  def desenha(self):
+    self.tela.fill((255, 255, 255))
+    self.tela.blit(self.Titulo, (self.PX,self.PY))
+    self.tela.blit(self.Escolha, (self.px, self.py))
+    for i in range(len(self.lista_escolha)):
+      self.tela.blit(self.lista_escolha[i],(self.px_personagens,self.py_personagens[i]))
+    for i in range(len(self.lista_escolha)):
+      if self.posicao == i and not self.escolha_jogador1:
+        escolha_jogador = self.personagens.render(f' [Jogador 1]',True,(122,122,0))
+        self.tela.blit(escolha_jogador,(self.px_personagens+self.lista_escolha[i].get_rect().width,self.py_personagens[i]))
+      elif self.posicao == i and self.escolha_jogador1:
+        escolha_jogador = self.personagens.render(f' [Jogador 2]',True,(122,122,0))
+        self.tela.blit(escolha_jogador,(self.px_personagens+self.lista_escolha[i].get_rect().width,self.py_personagens[i]))
+    pg.display.flip() 
