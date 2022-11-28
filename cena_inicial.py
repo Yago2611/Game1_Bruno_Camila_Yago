@@ -2,7 +2,6 @@ import pygame as pg
 import sys
 from configuracoes import Configuracoes
 from personagens_criados import Personagens_criados
-from copy import copy
 from jogador import Jogador 
 
 class Cena_inicial:
@@ -18,7 +17,7 @@ class Cena_inicial:
     self.personagens = pg.font.SysFont(None, Configuracoes.FONTE_MENOR)
     self.Titulo = self.titulo.render(f'Guerra de Cientistas',True,(0,0,0))
     self.Escolha = self.escolha.render(f'Escolha um personagem:', True, (0,0,0))
-    self.lista_personagens = Personagens_criados.lista 
+    self.lista_personagens = Personagens_criados().cria_lista()
     self.lista_escolha = []
     self.encerrada = False
     for i in range(len(self.lista_personagens)):
@@ -50,10 +49,12 @@ class Cena_inicial:
           if self.posicao>0 and self.posicao<=3:
             self.posicao-=1
         if self.escolha_jogador1 == False and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-            self.jogador1 = Jogador(Configuracoes.P1X,Configuracoes.P1Y,(self.lista_personagens)[self.posicao])
+            p1 = Personagens_criados().cria_lista()[self.posicao]
+            self.jogador1 = Jogador(Configuracoes.P1X,Configuracoes.P1Y,p1)
             self.escolha_jogador1 = True        
         elif self.escolha_jogador1 and event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-            self.jogador2 = Jogador(Configuracoes.P2X,Configuracoes.P2Y,(self.lista_personagens)[self.posicao])
+            p2 = Personagens_criados().cria_lista()[self.posicao]
+            self.jogador2 = Jogador(Configuracoes.P2X,Configuracoes.P2Y,p2)
             self.escolha_jogador2 = True        
   def atualiza_estado(self):
       if self.escolha_jogador1 and self.escolha_jogador2:
