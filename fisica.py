@@ -9,6 +9,7 @@ class Fisica:
       return (((((corpo1.px+corpo1.largura)//2)-((corpo2.px+corpo2.largura)//2))**2 + ((((corpo1.py+corpo1.altura)//2))-((corpo2.py+corpo2.altura)//2))**2)**0.5)
     def movimento(self,novo_corpo,corpos):
       mapa = Mapa()
+      valor = 0 
       for corpo in corpos:
           for ente in corpo:
             if self.contato(novo_corpo,ente):
