@@ -6,6 +6,7 @@ class Estado_jogo:
     self.inicio_animacao = inicio
     self.inicio_minions = inicio
     self.inicio_morte = 0 
+    self.inicio_tosse = inicio
   def encerra(self,agora,tempo,jogador1,jogador2):
     if jogador1.vida_atual<=0 and self.inicio_morte == 0:
         jogador1.frame = 0
@@ -30,3 +31,9 @@ class Estado_jogo:
         for ente in corpo:
           ente.frame+=1
       self.inicio_animacao = agora
+  def tosse(self,agora,corpos):
+    if agora - self.inicio_tosse > 10:
+      for corpo in corpos:
+        if corpo.tempo_parado == 10:
+          corpo.tossir(agora)
+      self.inicio_tosse = agora
