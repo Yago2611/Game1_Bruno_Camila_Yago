@@ -13,6 +13,9 @@ class Minions:
         self.frame = 0
         self.vx = 0
         self.vy = 0
+        self.dano_dado = 10
+        self.dano_recebido = 1
+        self.tempo_de_ataque = 0
         self.tempo_morte = 0 
         self.tempo_atacado = 0 
         self.ataque_valor = False
@@ -49,10 +52,13 @@ class Minions:
         self.vel = ((self.vx**2 + self.vy**2)**0.5)/(0.8*Configuracoes.VELOCIDADE)
         self.vx /= self.vel
         self.vy /= self.vel #Formamos os vetores unitarios
-    def ataque(self):
-      if self.vida_atual>0:
+    def ataque(self,agora):
+      if self.vida_atual>0 and self.tempo_de_ataque == 0 and not self.atacado_valor:
+        self.tempo_de_ataque = time.time()
         self.frame = 0
         self.ataque_valor = True    
+      elif agora - self.tempo_de_ataque > 2:
+        self.tempo_de_ataque = 0
     def atacar(self,corpos,mapa):
       if self.vida_atual> 0 and self.ataque_valor and self.frame == 5:
         fisica = Fisica()
@@ -63,7 +69,7 @@ class Minions:
         for corpo in corpos:
             for ente in corpo:
               if fisica.contato(minion_teste,ente):
-                  ente.vida_atual-=10
+                  ente.vida_atual-=self.dano_dado*ente.dano_recebido
                   novo_ente = Minions(corpos)
                   novo_ente.px = ente.px + 50*self.vetorx
                   novo_ente.py = ente.py + 50*self.vetory
