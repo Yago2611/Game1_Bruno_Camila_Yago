@@ -9,6 +9,13 @@ class Jogador:
       self.py = py
       self.frame = 0 
       self.personagem = personagem
+      self.dano_recebido = personagem.dano_recebido
+      self.dano_dado = personagem.dano_dado
+      self.reconhecimento = personagem.reconhecimento
+      self.reconhecido = 1
+      self.probabilidade = personagem.probabilidade
+      self.teste_probabilistico = 1
+      self.tempo_parado = personagem.tempo_parado
       self.ataque_valor = False
       self.atacado_valor = False 
       self.tempo_atacado = 0 
@@ -27,6 +34,7 @@ class Jogador:
       self.vy = 0
       self.vida_maxima = personagem.vida_maxima
       self.vida_atual = self.vida_maxima
+      self.vida_teste = self.vida_atual
       self.comprimento_barra_vida = 50
       self.razao_vida = self.vida_maxima / self.comprimento_barra_vida
     def desenha_vida(self,tela):
@@ -45,7 +53,7 @@ class Jogador:
       self.vx /= modulo  
       self.vy /= modulo
     def ataque(self):
-      if self.vida_atual>0:
+      if self.vida_atual>0 and not self.atacado_valor:
         self.frame = 0
         self.ataque_valor = True
     def atacar(self,corpos,mapa):
@@ -56,10 +64,10 @@ class Jogador:
         for corpo in corpos:
             for ente in corpo:
               if fisica.contato(jogador_teste,ente):
-                  ente.vida_atual-=10
+                  ente.vida_atual-=self.dano_dado*ente.dano_recebido
                   novo_ente = Minions(corpos)
-                  novo_ente.px = ente.px + 20*self.vetorx
-                  novo_ente.py = ente.py + 20*self.vetory
+                  novo_ente.px = ente.px + 50*self.vetorx
+                  novo_ente.py = ente.py + 50*self.vetory
                   corpos_teste = []
                   for x in corpos:
                     x_teste = x[:]
@@ -76,7 +84,7 @@ class Jogador:
     def atacado(self,agora):
       if(self.atacado_valor and self.tempo_atacado == 0):
         self.tempo_atacado = time.time()
-      if(agora - self.tempo_atacado > 3):
+      if(agora - self.tempo_atacado > 2):
         self.atacado_valor = False
         self.tempo_atacado = 0 
     def movimento(self,corpos):
@@ -88,6 +96,19 @@ class Jogador:
         if not self.atacado_valor and fisica.movimento(jogador_teste,corpos):
           self.px = novo_px
           self.py = novo_py
+    def tossir(self,agora):
+      self.atacado_valor = True
+      self.tempo_atacado = agora-1
+      self.vida_atual-=5
+    def teste_dano(self):
+      if self.vida_atual < self.vida_teste:
+        if self.teste_probabilistico == self.probabilidade:
+           self.vida_atual = self.vida_teste
+        else:
+            self.vida_teste = self.vida_atual
+        self.teste_probabilistico+=1
+      if self.teste_probabilistico>self.probabilidade:
+        self.teste_probabilistico = 1
     def desenha(self,tela):
       if self.vida_atual>0:
         self.vetor_direcao()
