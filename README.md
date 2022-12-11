@@ -1,32 +1,29 @@
 # Game1_Bruno_Camila_Yago
-Uns dos melhores cientistas da histŕia foram teletransportados para uma arena onde devem competir pelo nobel
+Todos os arquivos do Github devem ser instalados, junto com o pygame
+
+Uns dos melhores cientistas da história foram teletransportados para uma arena onde devem competir pelo nobel por
 1:30
 
 Erwin Schrödinger
 vantagens: quando acertado pode ou nao ter tomado dano, sera decidido aleatoriamente com 50% de chance
-desvantagens:
-a cada 5s ele para pra tossir devido a sua tuberculose
+desvantagens: a cada 10s ele para pra tossir devido a sua tuberculose
 
-fisico:
-projeteis: joga um gato
+Poder: teletransporte
 
 Marie Curie
-vantagens: toma menos dano
-desvantagens: da menos dano por causa do machismo estrutural
+vantagens: Toma menos dano
+desvantagens: Dá menos dano
 
-fisico:
-de area: nuvem verde de radioatividade (veneno)
+Poder: nuvem verde de radioatividade (veneno)
 
 Nikola Tesla
 vantagens: da mais dano
 desvantagens:  1 a cada 3 ataques nao sao reconhecidos
 
-fisico: 
-projeteis: joga um raio
+Poder: joga um raio
 
 Charles Darwin
 vantagens:  tem mais vida
 desvantagens: mais devagar
 
-fisico:
-de area: (cura)
+Poder: cura
